@@ -33,24 +33,34 @@ export default function App() {
 
   return (
     <div className="page">
-      <div className="card">
-        <div className="hero">
+      <div className="background-glow glow-1"></div>
+      <div className="background-glow glow-2"></div>
+
+      <main className="app-shell">
+        <section className="hero-card">
           <img src={logo} alt="ShibaAI logo" className="hero-logo" />
-          <h1>ShibaAI</h1>
-          <p>Your study copilot for faster, smarter review.</p>
-        </div>
+          <div className="hero-text">
+            <h1>ShibaAI</h1>
+            <p>
+              Your study copilot for smarter review, targeted practice, and
+              faster learning.
+            </p>
+          </div>
+        </section>
 
-        <NotesInput
-          notes={notes}
-          setNotes={setNotes}
-          onGenerate={handleGenerateQuiz}
-          loading={loading}
-        />
+        <section className="main-card">
+          <NotesInput
+            notes={notes}
+            setNotes={setNotes}
+            onGenerate={handleGenerateQuiz}
+            loading={loading}
+          />
 
-        <ErrorMessage message={error} />
+          <ErrorMessage message={error} />
 
-        <QuizResults questions={questions} />
-      </div>
+          <QuizResults questions={questions} />
+        </section>
+      </main>
     </div>
   );
 }
