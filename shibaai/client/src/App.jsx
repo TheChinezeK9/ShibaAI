@@ -3,6 +3,7 @@ import NotesInput from "./components/NotesInput.jsx";
 import QuizResults from "./components/QuizResults.jsx";
 import ErrorMessage from "./components/ErrorMessage.jsx";
 import { generateQuiz } from "./services/api.js";
+import logo from "./assets/ShibaAI.png";
 
 export default function App() {
   const [notes, setNotes] = useState("");
@@ -34,6 +35,7 @@ export default function App() {
     <div className="page">
       <div className="card">
         <div className="hero">
+          <img src={logo} alt="ShibaAI logo" className="hero-logo" />
           <h1>ShibaAI</h1>
           <p>Your study copilot for faster, smarter review.</p>
         </div>
