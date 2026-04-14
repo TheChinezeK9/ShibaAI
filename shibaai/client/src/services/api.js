@@ -1,7 +1,10 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function generateQuiz(notes) {
-  const response = await fetch(`${API_URL}/api/quiz/generate`, {
+  const url = `${API_URL}/api/quiz/generate`;
+  console.log("Requesting:", url);
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -10,13 +13,17 @@ export async function generateQuiz(notes) {
   });
 
   const contentType = response.headers.get("content-type") || "";
+  const text = await response.text();
+
+  console.log("Status:", response.status);
+  console.log("Content-Type:", contentType);
+  console.log("Raw response:", text);
 
   if (!contentType.includes("application/json")) {
-    const text = await response.text();
-    throw new Error("API returned HTML instead of JSON. Check VITE_API_URL.");
+    throw new Error(`Expected JSON but got: ${text.slice(0, 120)}`);
   }
 
-  const data = await response.json();
+  const data = JSON.parse(text);
 
   if (!response.ok) {
     throw new Error(data.error || "Request failed.");
