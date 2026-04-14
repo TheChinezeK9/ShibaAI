@@ -4,15 +4,20 @@ export default function QuizResults({ questions }) {
   }
 
   return (
-    <section className="section results">
-      <h2>Quiz Questions</h2>
-      <ol className="quiz-list">
-        {questions.map((item) => (
-          <li key={item.id} className="quiz-item">
-            {item.question}
-          </li>
+    <section className="section results-section">
+      <div className="section-header">
+        <h2>Your Quiz</h2>
+        <p>Here are your generated practice questions.</p>
+      </div>
+
+      <div className="quiz-grid">
+        {questions.map((item, index) => (
+          <div key={item.id || index} className="quiz-card">
+            <div className="quiz-number">Q{index + 1}</div>
+            <p>{item.question}</p>
+          </div>
         ))}
-      </ol>
+      </div>
     </section>
   );
 }
