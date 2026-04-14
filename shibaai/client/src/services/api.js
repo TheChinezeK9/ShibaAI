@@ -9,6 +9,13 @@ export async function generateQuiz(notes) {
     body: JSON.stringify({ notes })
   });
 
+  const contentType = response.headers.get("content-type") || "";
+
+  if (!contentType.includes("application/json")) {
+    const text = await response.text();
+    throw new Error("API returned HTML instead of JSON. Check VITE_API_URL.");
+  }
+
   const data = await response.json();
 
   if (!response.ok) {
