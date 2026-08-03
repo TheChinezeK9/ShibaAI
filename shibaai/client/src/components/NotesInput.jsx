@@ -19,11 +19,16 @@ export default function NotesInput({ notes, setNotes, onGenerate, loading }) {
         placeholder="Example: Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to make glucose and oxygen..."
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
+        maxLength={12000}
+        disabled={loading}
       />
 
-      <button className="button" onClick={onGenerate} disabled={loading}>
-        {loading ? "Generating Quiz..." : "Generate Quiz"}
-      </button>
+      <div className="input-actions">
+        <span className="character-count">{notes.length.toLocaleString()} / 12,000</span>
+        <button className="button" onClick={onGenerate} disabled={loading}>
+          {loading ? "Building your quiz…" : "Generate Quiz"}
+        </button>
+      </div>
     </section>
   );
 }

@@ -10,6 +10,19 @@ export async function generateQuiz(req, res) {
       });
     }
 
+
+    if (notes.trim().length < 40) {
+      return res.status(400).json({
+        error: "Add a little more detail so ShibaAI can build a useful quiz."
+      });
+    }
+
+    if (notes.length > 12000) {
+      return res.status(400).json({
+        error: "Notes must be 12,000 characters or fewer."
+      });
+    }
+
     const questions = await generateQuizFromNotes(notes);
 
     return res.json({ questions });

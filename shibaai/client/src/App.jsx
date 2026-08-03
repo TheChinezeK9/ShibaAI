@@ -10,6 +10,7 @@ export default function App() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [quizKey, setQuizKey] = useState(0);
 
   async function handleGenerateQuiz() {
     setError("");
@@ -24,6 +25,7 @@ export default function App() {
       setLoading(true);
       const data = await generateQuiz(notes);
       setQuestions(data.questions || []);
+      setQuizKey((key) => key + 1);
     } catch (err) {
       setError(err.message || "Failed to generate quiz.");
     } finally {
@@ -58,7 +60,7 @@ export default function App() {
 
           <ErrorMessage message={error} />
 
-          <QuizResults questions={questions} />
+          <QuizResults key={quizKey} questions={questions} />
         </section>
       </main>
     </div>
