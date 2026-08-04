@@ -3,6 +3,7 @@ import QuizResults from "./components/QuizResults.jsx";
 import ErrorMessage from "./components/ErrorMessage.jsx";
 import { generateQuiz, generateStudyTool } from "./services/api.js";
 import logo from "./assets/ShibaAI.png";
+import { AboutPage, PricingPage, ResourcesPage, FAQPage, ContactPage } from "./components/MarketingPages.jsx";
 
 const tools = [
   { id: "quiz", icon: "✦", name: "Smart Quiz", description: "Test yourself with adaptive multiple-choice questions." },
@@ -13,13 +14,19 @@ const tools = [
   { id: "vocabulary", icon: "Aa", name: "Key Terms", description: "Extract essential vocabulary and definitions." },
   { id: "essay-outline", icon: "¶", name: "Essay Outline", description: "Shape notes into a clear, supported argument." },
   { id: "practice", icon: "?", name: "Practice Questions", description: "Generate short-answer prompts for active recall." }
+  ,{ id: "mnemonics", icon: "M", name: "Memory Tricks", description: "Create mnemonics and associations that actually stick." }
+  ,{ id: "timeline", icon: "↝", name: "Timeline Maker", description: "Put events and processes into a clear sequence." }
+  ,{ id: "formula-sheet", icon: "∑", name: "Formula Sheet", description: "Organize formulas, variables, and when to use them." }
+  ,{ id: "note-cleanup", icon: "✓", name: "Note Cleanup", description: "Rewrite messy notes into a polished learning resource." }
 ];
 
 function Chevron() {
   return <svg className="menu-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5.5 7.5 4.5 4.5 4.5-4.5" /></svg>;
 }
 
-function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) {
+function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, onNavigate }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  function mobileNavigate(page) { setMobileOpen(false); onNavigate(page); }
   return (
     <header className="site-header">
       <button className="brand" onClick={onHome} aria-label="ShibaAI home">
@@ -35,7 +42,11 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) 
             <div>{tools.map((tool) => <button key={tool.id} onClick={() => onDashboard(tool.id)}><span>{tool.icon}</span><b>{tool.name}</b></button>)}</div>
           </div>
         </div>
+        <button onClick={() => onNavigate("about")}>About</button>
+        <button onClick={() => onNavigate("pricing")}>Pricing</button>
+        <div className="nav-dropdown more-dropdown"><button className="dropdown-trigger">More <Chevron /></button><div className="simple-dropdown"><button onClick={() => onNavigate("resources")}><span>▤</span><div><b>Resources</b><small>Study guides and ideas</small></div></button><button onClick={() => onNavigate("faq")}><span>?</span><div><b>FAQ</b><small>Common questions answered</small></div></button><button onClick={() => onNavigate("contact")}><span>✉</span><div><b>Contact</b><small>Talk with our team</small></div></button></div></div>
       </nav>
+      <button className={`mobile-menu-button ${mobileOpen ? "open" : ""}`} onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu"><span /><span /><span /></button>
       <div className="header-actions">
         {user ? (
           <div className="profile-menu">
@@ -52,12 +63,41 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) 
           </>
         )}
       </div>
+      {mobileOpen && <div className="mobile-menu"><button onClick={() => mobileNavigate("home")}>Home</button><button onClick={() => { setMobileOpen(false); onDashboard(); }}>Study tools</button><button onClick={() => mobileNavigate("about")}>About</button><button onClick={() => mobileNavigate("pricing")}>Pricing</button><button onClick={() => mobileNavigate("resources")}>Resources</button><button onClick={() => mobileNavigate("faq")}>FAQ</button><button onClick={() => mobileNavigate("contact")}>Contact</button></div>}
     </header>
   );
 }
 
-function Footer({ onHome, onStart, user }) {
-  return <footer className="site-footer"><div className="footer-main"><div className="footer-brand"><button className="brand" onClick={onHome}><img src={logo} alt="" /><span>Shiba<span>AI</span></span></button><p>Your friendly AI study copilot—built to turn class notes into confident learning.</p><span className="footer-badge">✦ Learn smarter every day</span></div><div className="footer-column"><strong>Product</strong><button onClick={onHome}>Home</button><button onClick={() => onStart("quiz")}>Dashboard</button><button onClick={() => onStart("study-guide")}>Study guides</button></div><div className="footer-column"><strong>Popular tools</strong><button onClick={() => onStart("quiz")}>Smart Quiz</button><button onClick={() => onStart("flashcards")}>Flashcards</button><button onClick={() => onStart("summary")}>Quick Summary</button><button onClick={() => onStart("explain")}>Explain It</button></div><div className="footer-column"><strong>Account</strong><button onClick={() => onStart()}>{user ? "My study space" : "Create account"}</button><a href="mailto:hello@shibaai.app">Contact</a><span>Student-first design</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} ShibaAI. Made for curious minds.</span><div><span>Privacy</span><span>Terms</span></div></div></footer>;
+function Footer({ onHome, onStart, user, onLegal }) {
+  return <footer className="site-footer"><div className="footer-paws" aria-hidden="true">🐾　🐾　🐾</div><div className="footer-main"><div className="footer-brand"><button className="brand" onClick={onHome}><img src={logo} alt="" /><span>Shiba<span>AI</span></span></button><p>Your friendly AI study copilot—built to turn class notes into confident learning.</p><span className="footer-badge">✦ Learn smarter every day</span></div><div className="footer-column"><strong>Product</strong><button onClick={onHome}>Home</button><button onClick={() => onStart("quiz")}>Dashboard</button><button onClick={() => onStart("study-guide")}>Study guides</button></div><div className="footer-column"><strong>Popular tools</strong><button onClick={() => onStart("quiz")}>Smart Quiz</button><button onClick={() => onStart("flashcards")}>Flashcards</button><button onClick={() => onStart("summary")}>Quick Summary</button><button onClick={() => onStart("explain")}>Explain It</button></div><div className="footer-column"><strong>Account & support</strong><button onClick={() => onStart()}>{user ? "My study space" : "Create account"}</button><a href="mailto:hello@shibaai.app">Contact</a><button onClick={() => onLegal("privacy")}>Privacy policy</button><button onClick={() => onLegal("terms")}>Terms of use</button></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} ShibaAI. Made for curious minds.</span><div><button onClick={() => onLegal("privacy")}>Privacy</button><button onClick={() => onLegal("terms")}>Terms</button></div></div></footer>;
+}
+
+const legalCopy = {
+  privacy: { title: "Privacy Policy", updated: "August 4, 2026", sections: [
+    ["The short version", "ShibaAI is designed to help you study, not to sell your attention. This prototype stores account details, profile photos, and recent study history in your own browser. Study material is sent to our server and the configured AI provider only when you ask ShibaAI to generate something."],
+    ["Information we process", "We may process the name and email you enter, an optional profile image, notes or topics you submit, generated study materials, basic technical logs, and service-error information. Do not submit passwords, financial information, health records, or other highly sensitive personal data as study material."],
+    ["How information is used", "Information is used to provide study tools, remember local preferences, operate and secure the service, diagnose failures, prevent abuse, and improve product quality. We do not sell personal information or use study notes for targeted advertising."],
+    ["AI processing", "Submitted study material is transmitted to the backend and may be processed by Google Gemini to produce your requested output. AI systems can make mistakes. Review generated material before relying on it for schoolwork or important decisions."],
+    ["Storage and retention", "In the current prototype, profile and study-history data remains in browser local storage until you clear it, remove it through the interface, or clear browser data. Server and hosting providers may temporarily retain operational logs according to their own retention practices."],
+    ["Children and students", "ShibaAI is an educational tool. Users under the age required to consent to online services in their location should use ShibaAI only with permission from a parent, guardian, school, or authorized educator."],
+    ["Your choices", "You can edit or remove your profile photo, clear recent study sessions, log out, clear browser storage, and stop using the service. You may contact hello@shibaai.app with privacy questions or deletion requests."],
+    ["Changes", "We may update this policy as ShibaAI adds real accounts, cloud storage, analytics, or subscriptions. Material changes will be reflected by a new effective date and, when appropriate, an in-product notice."]
+  ]},
+  terms: { title: "Terms of Use", updated: "August 4, 2026", sections: [
+    ["Accepting these terms", "By accessing or using ShibaAI, you agree to these Terms. If you do not agree, do not use the service. If you use ShibaAI for a school or organization, you confirm that you are authorized to follow its policies."],
+    ["Educational purpose", "ShibaAI provides study assistance and AI-generated educational material. It does not guarantee grades, factual accuracy, originality, or acceptance by an instructor. You are responsible for checking outputs and following your school’s academic-integrity and AI-use rules."],
+    ["Your responsibilities", "Use the service lawfully and respectfully. Do not attempt to disrupt the service, bypass limits, access another user’s information, submit malicious code, reverse engineer protected systems, or use generated material to impersonate others or facilitate academic dishonesty."],
+    ["Your content", "You retain ownership of notes and other material you submit. You grant ShibaAI a limited permission to process that material solely to operate, secure, and improve the requested service. You confirm that you have the right to submit the content."],
+    ["AI-generated content", "Outputs may be incomplete, inaccurate, biased, or similar to content produced for others. Generated material is provided for study support and should not be treated as professional, medical, legal, or financial advice."],
+    ["Accounts and availability", "Prototype accounts are stored locally and are not secure production accounts. We may change, suspend, limit, or discontinue features at any time. Service availability can be affected by hosting providers, AI-provider quotas, maintenance, and events outside our control."],
+    ["Disclaimer and liability", "The service is provided “as is” and “as available” to the extent permitted by law. ShibaAI disclaims implied warranties and is not liable for indirect, incidental, special, or consequential losses arising from use of the service."],
+    ["Contact", "Questions about these Terms can be sent to hello@shibaai.app. These terms may be updated as the product develops; continued use after an update indicates acceptance of the revised terms."]
+  ]}
+};
+
+function LegalModal({ type, onClose }) {
+  const page = legalCopy[type];
+  return <div className="modal-backdrop legal-backdrop" onMouseDown={onClose}><article className="legal-modal" onMouseDown={(e) => e.stopPropagation()}><header><div><span className="eyebrow">SHIBAAI LEGAL</span><h1>{page.title}</h1><p>Effective {page.updated}</p></div><button className="modal-close" onClick={onClose}>×</button></header><div className="legal-intro">🐕 Clear rules, plain language, and respect for student privacy.</div>{page.sections.map(([heading,body]) => <section key={heading}><h2>{heading}</h2><p>{body}</p></section>)}<div className="legal-note">This product is still in development. These documents are a practical starting point and should be reviewed by qualified counsel before a commercial launch.</div></article></div>;
 }
 
 function ProfileModal({ user, onClose, onSave }) {
@@ -110,6 +150,8 @@ function Home({ onStart }) {
         </div>
       </section>
 
+      <section className="how-it-works"><div className="shiba-callout"><img src={logo} alt="ShibaAI mascot" /><div><span className="eyebrow">YOUR STUDY COMPANION</span><h2>From messy notes to “I’ve got this.”</h2><p>ShibaAI handles the organizing so you can spend your energy learning.</p></div></div><div className="steps-grid"><article><span>01</span><b>🐾</b><h3>Bring your notes</h3><p>Paste a lecture, textbook section, rough outline, or any topic you want to master.</p></article><article><span>02</span><b>🦴</b><h3>Pick your tool</h3><p>Choose from twelve focused tools built for different kinds of studying.</p></article><article><span>03</span><b>🎓</b><h3>Learn actively</h3><p>Quiz yourself, review explanations, and return to your recent sessions anytime.</p></article></div></section>
+
       <section className="cta-band"><div><span className="eyebrow">READY WHEN YOU ARE</span><h2>Your notes are about to get a lot more useful.</h2></div><button className="button light-button" onClick={() => onStart()}>Start studying free →</button></section>
     </main>
   );
@@ -128,6 +170,20 @@ function AuthModal({ mode, onClose, onSuccess, setMode }) {
 function ToolResult({ result }) {
   if (!result) return null;
   return <section className="generated-result"><div className="result-heading"><span>✦</span><div><small>YOUR RESULT</small><h2>{result.title}</h2></div></div><div className="result-list">{result.items?.map((item, index) => <article key={index}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{item.heading}</h3><p>{item.content}</p></div></article>)}</div></section>;
+}
+
+function FocusTimer() {
+  const [seconds, setSeconds] = useState(25 * 60);
+  const [running, setRunning] = useState(false);
+  useEffect(() => {
+    if (!running) return undefined;
+    const timer = setInterval(() => setSeconds((value) => { if (value <= 1) { setRunning(false); return 0; } return value - 1; }), 1000);
+    return () => clearInterval(timer);
+  }, [running]);
+  const minutes = Math.floor(seconds / 60).toString().padStart(2,"0");
+  const remainder = (seconds % 60).toString().padStart(2,"0");
+  function reset(value = 25) { setRunning(false); setSeconds(value * 60); }
+  return <div className="focus-timer"><div className="timer-mascot">🐕</div><div><small>SHIBA FOCUS</small><strong>{minutes}:{remainder}</strong></div><button onClick={() => setRunning(!running)}>{running ? "Pause" : seconds === 0 ? "Restart" : "Focus"}</button><button className="timer-reset" onClick={() => reset()}>↻</button><div className="timer-presets"><button onClick={() => reset(25)}>25m</button><button onClick={() => reset(45)}>45m</button><button onClick={() => reset(5)}>Break</button></div></div>;
 }
 
 function Dashboard({ initialTool, user }) {
@@ -153,7 +209,7 @@ function Dashboard({ initialTool, user }) {
     finally { setLoading(false); }
   }
 
-  return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div className="sidebar-tip"><span>✦</span><strong>Study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><label htmlFor="study-notes">Paste your notes or topic</label><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "ShibaAI is thinking…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}{history.length > 0 && !result && <section className="recent-section"><div className="recent-heading"><div><span className="eyebrow">YOUR LIBRARY</span><h2>Recent study sessions</h2></div><button onClick={() => { setHistory([]); localStorage.removeItem("shibaai-history"); }}>Clear</button></div><div className="recent-grid">{history.map((item) => <button key={item.id} onClick={() => chooseTool(tools.find((tool) => tool.name === item.tool)?.id || "quiz")}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.tool} · {item.date}</small></div><b>→</b></button>)}</div></section>}</section></main>;
+  return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div><FocusTimer /><div className="sidebar-tip"><span>🐾</span><strong>Shiba study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><div className="generator-title"><div><span className="paw-dot">🐾</span><label htmlFor="study-notes">Paste your notes or topic</label></div><span>Shiba is ready to help</span></div><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "ShibaAI is thinking…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}{history.length > 0 && !result && <section className="recent-section"><div className="recent-heading"><div><span className="eyebrow">YOUR LIBRARY</span><h2>Recent study sessions</h2></div><button onClick={() => { setHistory([]); localStorage.removeItem("shibaai-history"); }}>Clear</button></div><div className="recent-grid">{history.map((item) => <button key={item.id} onClick={() => chooseTool(tools.find((tool) => tool.name === item.tool)?.id || "quiz")}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.tool} · {item.date}</small></div><b>→</b></button>)}</div></section>}</section></main>;
 }
 
 export default function App() {
@@ -161,10 +217,13 @@ export default function App() {
   const [selectedTool, setSelectedTool] = useState("quiz");
   const [authMode, setAuthMode] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [legalPage, setLegalPage] = useState(null);
   const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem("shibaai-user")); } catch { return null; } });
   function openDashboard(tool = "quiz") { setSelectedTool(tool); if (user) setView("dashboard"); else setAuthMode("signup"); }
   function login(nextUser) { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setAuthMode(null); setView("dashboard"); }
   function logout() { localStorage.removeItem("shibaai-user"); setUser(null); setView("home"); }
   function saveProfile(nextUser) { try { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setProfileOpen(false); } catch { alert("That photo is too large for browser storage. Try a smaller image."); } }
-  return <div className="app"><Header user={user} onHome={() => setView("home")} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{view === "home" ? <Home onStart={openDashboard} /> : <Dashboard initialTool={selectedTool} user={user} />}<Footer user={user} onHome={() => setView("home")} onStart={openDashboard} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}</div>;
+  const pages = { home: <Home onStart={openDashboard} />, dashboard: user ? <Dashboard initialTool={selectedTool} user={user} /> : <Home onStart={openDashboard} />, about: <AboutPage onStart={openDashboard} />, pricing: <PricingPage onStart={openDashboard} />, resources: <ResourcesPage onStart={openDashboard} />, faq: <FAQPage />, contact: <ContactPage /> };
+  function navigate(page) { setView(page); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  return <div className="app"><Header user={user} onHome={() => navigate("home")} onNavigate={navigate} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{pages[view] || pages.home}<Footer user={user} onHome={() => navigate("home")} onStart={openDashboard} onLegal={setLegalPage} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}{legalPage && <LegalModal type={legalPage} onClose={() => setLegalPage(null)} />}</div>;
 }
