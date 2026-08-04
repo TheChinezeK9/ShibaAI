@@ -15,6 +15,10 @@ const tools = [
   { id: "practice", icon: "?", name: "Practice Questions", description: "Generate short-answer prompts for active recall." }
 ];
 
+function Chevron() {
+  return <svg className="menu-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5.5 7.5 4.5 4.5 4.5-4.5" /></svg>;
+}
+
 function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) {
   return (
     <header className="site-header">
@@ -25,7 +29,7 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) 
       <nav>
         <button onClick={onHome}>Home</button>
         <div className="nav-dropdown">
-          <button className="dropdown-trigger" onClick={() => onDashboard()}>Study tools <span>⌄</span></button>
+          <button className="dropdown-trigger" onClick={() => onDashboard()}>Study tools <Chevron /></button>
           <div className="tools-dropdown">
             <small>CHOOSE A STUDY TOOL</small>
             <div>{tools.map((tool) => <button key={tool.id} onClick={() => onDashboard(tool.id)}><span>{tool.icon}</span><b>{tool.name}</b></button>)}</div>
@@ -37,7 +41,7 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) 
           <div className="profile-menu">
             <button className="profile-trigger" aria-label="Open profile menu">
               <span className="user-chip">{user.avatar ? <img src={user.avatar} alt="Your profile" /> : user.name.slice(0, 1).toUpperCase()}</span>
-              <span className="profile-name">{user.name}</span><span>⌄</span>
+              <span className="profile-name">{user.name}</span><Chevron />
             </button>
             <div className="profile-dropdown"><div className="profile-summary"><span className="user-chip">{user.avatar ? <img src={user.avatar} alt="" /> : user.name.slice(0, 1).toUpperCase()}</span><div><strong>{user.name}</strong><small>{user.email}</small></div></div><button onClick={onProfile}>◉ Edit profile</button><button onClick={() => onDashboard()}>✦ My study space</button><button className="logout-item" onClick={onLogout}>↗ Log out</button></div>
           </div>
@@ -50,6 +54,10 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) 
       </div>
     </header>
   );
+}
+
+function Footer({ onHome, onStart, user }) {
+  return <footer className="site-footer"><div className="footer-main"><div className="footer-brand"><button className="brand" onClick={onHome}><img src={logo} alt="" /><span>Shiba<span>AI</span></span></button><p>Your friendly AI study copilot—built to turn class notes into confident learning.</p><span className="footer-badge">✦ Learn smarter every day</span></div><div className="footer-column"><strong>Product</strong><button onClick={onHome}>Home</button><button onClick={() => onStart("quiz")}>Dashboard</button><button onClick={() => onStart("study-guide")}>Study guides</button></div><div className="footer-column"><strong>Popular tools</strong><button onClick={() => onStart("quiz")}>Smart Quiz</button><button onClick={() => onStart("flashcards")}>Flashcards</button><button onClick={() => onStart("summary")}>Quick Summary</button><button onClick={() => onStart("explain")}>Explain It</button></div><div className="footer-column"><strong>Account</strong><button onClick={() => onStart()}>{user ? "My study space" : "Create account"}</button><a href="mailto:hello@shibaai.app">Contact</a><span>Student-first design</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} ShibaAI. Made for curious minds.</span><div><span>Privacy</span><span>Terms</span></div></div></footer>;
 }
 
 function ProfileModal({ user, onClose, onSave }) {
@@ -158,5 +166,5 @@ export default function App() {
   function login(nextUser) { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setAuthMode(null); setView("dashboard"); }
   function logout() { localStorage.removeItem("shibaai-user"); setUser(null); setView("home"); }
   function saveProfile(nextUser) { try { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setProfileOpen(false); } catch { alert("That photo is too large for browser storage. Try a smaller image."); } }
-  return <div className="app"><Header user={user} onHome={() => setView("home")} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{view === "home" ? <Home onStart={openDashboard} /> : <Dashboard initialTool={selectedTool} user={user} />}{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}</div>;
+  return <div className="app"><Header user={user} onHome={() => setView("home")} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{view === "home" ? <Home onStart={openDashboard} /> : <Dashboard initialTool={selectedTool} user={user} />}<Footer user={user} onHome={() => setView("home")} onStart={openDashboard} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}</div>;
 }
