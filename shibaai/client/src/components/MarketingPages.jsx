@@ -44,11 +44,26 @@ function FAQSection({ compact = false }) {
 export function FAQPage() { return <main className="marketing-page"><PageHero eyebrow="HELP CENTER" title="Questions? Fetch an answer." description="Quick explanations about accounts, AI generation, privacy, pricing, and responsible studying."/><FAQSection/><section className="support-card"><span>🐕</span><div><h2>Still need a hand?</h2><p>Send the ShibaAI team a message and include the page or tool giving you trouble.</p></div><a className="button" href="mailto:hello@shibaai.app">Email support</a></section></main>; }
 
 function Newsletter() {
-  const [joined,setJoined] = useState(false);
-  return <section className="newsletter"><div><span className="eyebrow">THE WEEKLY WAG</span><h2>One useful study idea. Zero clutter.</h2><p>Occasional product updates and practical learning tips.</p></div>{joined ? <strong>✓ You’re on the list!</strong> : <form onSubmit={(e) => { e.preventDefault(); setJoined(true); }}><input type="email" placeholder="you@example.com" aria-label="Email address" required/><button type="submit">Join free →</button></form>}</section>;
+  const [email,setEmail] = useState("");
+  function requestInvite(event) {
+    event.preventDefault();
+    window.location.href = `mailto:hello@shibaai.app?subject=${encodeURIComponent("Weekly Wag invite")}&body=${encodeURIComponent(`Please add ${email} to the ShibaAI newsletter waitlist.`)}`;
+  }
+  return <section className="newsletter"><div><span className="eyebrow">THE WEEKLY WAG</span><h2>One useful study idea. Zero clutter.</h2><p>The newsletter is coming soon. Request an invite through your email app.</p></div><form onSubmit={requestInvite}><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" aria-label="Email address" required/><button type="submit">Request invite →</button></form></section>;
 }
 
 export function ContactPage() {
   const [sent,setSent] = useState(false);
-  return <main className="marketing-page contact-page"><PageHero eyebrow="CONTACT" title="Let’s talk." description="Questions, feedback, classroom ideas, and bug reports are always welcome."/><section className="contact-layout"><div className="contact-details"><article><span>✉</span><div><h3>General questions</h3><a href="mailto:hello@shibaai.app">hello@shibaai.app</a></div></article><article><span>🏫</span><div><h3>Schools and educators</h3><a href="mailto:schools@shibaai.app">schools@shibaai.app</a></div></article><article><span>🐾</span><div><h3>Support response</h3><p>We aim to respond within two school days.</p></div></article></div><div className="contact-form-card">{sent ? <div className="sent-state"><span>🐕</span><h2>Message received!</h2><p>Thanks for helping make ShibaAI better. We’ll get back to you soon.</p><button onClick={() => setSent(false)}>Send another</button></div> : <form onSubmit={(e) => { e.preventDefault(); setSent(true); }}><div className="form-row"><label>Name<input required/></label><label>Email<input type="email" required/></label></div><label>What can we help with?<select><option>General question</option><option>Technical support</option><option>Educator or school</option><option>Feedback or idea</option></select></label><label>Message<textarea minLength="10" required placeholder="Tell us a little more…"/></label><button className="button">Send message →</button><small>This prototype confirms submissions locally. Connect a form backend before launch.</small></form>}</div></section><Newsletter/></main>;
+  function prepareEmail(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const name = form.elements.namedItem("name").value;
+    const email = form.elements.namedItem("email").value;
+    const topic = form.elements.namedItem("topic").value;
+    const message = form.elements.namedItem("message").value;
+    const body = `Name: ${name}\nReply-to: ${email}\nTopic: ${topic}\n\n${message}`;
+    setSent(true);
+    window.location.href = `mailto:hello@shibaai.app?subject=${encodeURIComponent(`ShibaAI: ${topic}`)}&body=${encodeURIComponent(body)}`;
+  }
+  return <main className="marketing-page contact-page"><PageHero eyebrow="CONTACT" title="Let’s talk." description="Questions, feedback, classroom ideas, and bug reports are always welcome."/><section className="contact-layout"><div className="contact-details"><article><span>✉</span><div><h3>General questions</h3><a href="mailto:hello@shibaai.app">hello@shibaai.app</a></div></article><article><span>🏫</span><div><h3>Schools and educators</h3><a href="mailto:schools@shibaai.app">schools@shibaai.app</a></div></article><article><span>🐾</span><div><h3>Support response</h3><p>We aim to respond within two school days.</p></div></article></div><div className="contact-form-card">{sent ? <div className="sent-state"><span>🐕</span><h2>Your email draft is ready</h2><p>Send the draft from your email app to deliver your message to ShibaAI.</p><button onClick={() => setSent(false)}>Prepare another</button></div> : <form onSubmit={prepareEmail}><div className="form-row"><label>Name<input name="name" autoComplete="name" required/></label><label>Email<input name="email" type="email" autoComplete="email" required/></label></div><label>What can we help with?<select name="topic"><option>General question</option><option>Technical support</option><option>Educator or school</option><option>Feedback or idea</option></select></label><label>Message<textarea name="message" minLength="10" required placeholder="Tell us a little more…"/></label><button className="button">Open email draft →</button><small>This opens your email app; your message is sent only after you approve it there.</small></form>}</div></section><Newsletter/></main>;
 }
