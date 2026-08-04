@@ -24,7 +24,7 @@ function Chevron() {
   return <svg className="menu-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5.5 7.5 4.5 4.5 4.5-4.5" /></svg>;
 }
 
-function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, onNavigate }) {
+function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, onNavigate, onSearch, theme, onToggleTheme }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   function mobileNavigate(page) { setMobileOpen(false); onNavigate(page); }
   return (
@@ -48,6 +48,8 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, on
       </nav>
       <button className={`mobile-menu-button ${mobileOpen ? "open" : ""}`} onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu"><span /><span /><span /></button>
       <div className="header-actions">
+        <button className="icon-header-button" onClick={onSearch} aria-label="Search ShibaAI">⌕</button>
+        <button className="icon-header-button" onClick={onToggleTheme} aria-label={`Use ${theme === "dark" ? "light" : "dark"} mode`}>{theme === "dark" ? "☀" : "☾"}</button>
         {user ? (
           <div className="profile-menu">
             <button className="profile-trigger" aria-label="Open profile menu">
@@ -66,6 +68,15 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, on
       {mobileOpen && <div className="mobile-menu"><button onClick={() => mobileNavigate("home")}>Home</button><button onClick={() => { setMobileOpen(false); onDashboard(); }}>Study tools</button><button onClick={() => mobileNavigate("about")}>About</button><button onClick={() => mobileNavigate("pricing")}>Pricing</button><button onClick={() => mobileNavigate("resources")}>Resources</button><button onClick={() => mobileNavigate("faq")}>FAQ</button><button onClick={() => mobileNavigate("contact")}>Contact</button></div>}
     </header>
   );
+}
+
+function SearchModal({ onClose, onNavigate, onTool }) {
+  const [query,setQuery] = useState("");
+  const pages = [{id:"home",name:"Home",detail:"ShibaAI overview"},{id:"about",name:"About",detail:"Our mission and values"},{id:"pricing",name:"Pricing",detail:"Plans for students and schools"},{id:"resources",name:"Resources",detail:"Study strategies and guides"},{id:"faq",name:"FAQ",detail:"Common questions"},{id:"contact",name:"Contact",detail:"Get in touch"}];
+  const term = query.trim().toLowerCase();
+  const pageMatches = pages.filter((item) => !term || `${item.name} ${item.detail}`.toLowerCase().includes(term));
+  const toolMatches = tools.filter((item) => !term || `${item.name} ${item.description}`.toLowerCase().includes(term));
+  return <div className="modal-backdrop search-backdrop" onMouseDown={onClose}><section className="search-modal" onMouseDown={(event) => event.stopPropagation()}><div className="search-input"><span>⌕</span><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tools and pages…" aria-label="Search tools and pages"/><button onClick={onClose}>ESC</button></div><div className="search-results">{toolMatches.length > 0 && <div className="search-group"><small>STUDY TOOLS</small>{toolMatches.map((tool) => <button key={tool.id} onClick={() => { onTool(tool.id); onClose(); }}><span>{tool.icon}</span><div><strong>{tool.name}</strong><p>{tool.description}</p></div><b>→</b></button>)}</div>}{pageMatches.length > 0 && <div className="search-group"><small>PAGES</small>{pageMatches.map((page) => <button key={page.id} onClick={() => { onNavigate(page.id); onClose(); }}><span>↗</span><div><strong>{page.name}</strong><p>{page.detail}</p></div><b>→</b></button>)}</div>}{!toolMatches.length && !pageMatches.length && <div className="no-search"><span>🐕</span><h3>No trail found</h3><p>Try a tool name, subject, or page.</p></div>}</div><footer><span>↑↓ Browse</span><span>Enter Select</span><span>Esc Close</span></footer></section></div>;
 }
 
 function Footer({ onHome, onStart, user, onLegal }) {
@@ -179,8 +190,12 @@ function AuthModal({ mode, onClose, onSuccess, setMode }) {
 }
 
 function ToolResult({ result }) {
+  const [copied,setCopied] = useState(false);
   if (!result) return null;
-  return <section className="generated-result"><div className="result-heading"><span>✦</span><div><small>YOUR RESULT</small><h2>{result.title}</h2></div></div><div className="result-list">{result.items?.map((item, index) => <article key={index}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{item.heading}</h3><p>{item.content}</p></div></article>)}</div></section>;
+  const plainText = `${result.title}\n\n${result.items?.map((item,index) => `${index + 1}. ${item.heading}\n${item.content}`).join("\n\n")}`;
+  async function copyResult() { await navigator.clipboard.writeText(plainText); setCopied(true); setTimeout(() => setCopied(false),1500); }
+  function downloadResult() { const blob = new Blob([plainText],{type:"text/plain"}); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href=url; link.download=`${result.title.replace(/[^a-z0-9]+/gi,"-").toLowerCase() || "shibaai-study-result"}.txt`; link.click(); URL.revokeObjectURL(url); }
+  return <section className="generated-result"><div className="result-heading"><span>✦</span><div><small>YOUR RESULT</small><h2>{result.title}</h2></div><div className="result-actions"><button onClick={copyResult}>{copied ? "✓ Copied" : "Copy"}</button><button onClick={downloadResult}>Download</button><button onClick={() => window.print()}>Print</button></div></div><div className="result-list">{result.items?.map((item, index) => <article key={index}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{item.heading}</h3><p>{item.content}</p></div></article>)}</div></section>;
 }
 
 function FocusTimer() {
@@ -223,18 +238,30 @@ function Dashboard({ initialTool, user }) {
   return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div><FocusTimer /><div className="sidebar-tip"><span>🐾</span><strong>Shiba study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><div className="generator-title"><div><span className="paw-dot">🐾</span><label htmlFor="study-notes">Paste your notes or topic</label></div><span>Shiba is ready to help</span></div><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "ShibaAI is thinking…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}{history.length > 0 && !result && <section className="recent-section"><div className="recent-heading"><div><span className="eyebrow">YOUR LIBRARY</span><h2>Recent study sessions</h2></div><button onClick={() => { setHistory([]); localStorage.removeItem("shibaai-history"); }}>Clear</button></div><div className="recent-grid">{history.map((item) => <button key={item.id} onClick={() => chooseTool(tools.find((tool) => tool.name === item.tool)?.id || "quiz")}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.tool} · {item.date}</small></div><b>→</b></button>)}</div></section>}</section></main>;
 }
 
+const paths = { home:"/", about:"/about", pricing:"/pricing", resources:"/resources", faq:"/faq", contact:"/contact", dashboard:"/app" };
+function viewFromPath(pathname) { return Object.entries(paths).find(([,path]) => path === pathname)?.[0] || "not-found"; }
+
+function NotFoundPage({ onHome }) {
+  return <main className="not-found-page"><div className="lost-paws">🐾　🐾　🐾</div><img src={logo} alt="ShibaAI mascot"/><span className="eyebrow">404 · LOST THE TRAIL</span><h1>This page wandered off.</h1><p>Shiba checked under every study guide, but there’s nothing at this address.</p><button className="button" onClick={onHome}>Follow the paws home →</button></main>;
+}
+
 export default function App() {
-  const [view, setView] = useState("home");
-  const [selectedTool, setSelectedTool] = useState("quiz");
+  const [view, setView] = useState(() => viewFromPath(window.location.pathname));
+  const [selectedTool, setSelectedTool] = useState(() => new URLSearchParams(window.location.search).get("tool") || "quiz");
   const [authMode, setAuthMode] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [legalPage, setLegalPage] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [theme,setTheme] = useState(() => localStorage.getItem("shibaai-theme") || "light");
   const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem("shibaai-user")); } catch { return null; } });
-  function openDashboard(tool = "quiz") { setSelectedTool(tool); if (user) setView("dashboard"); else setAuthMode("signup"); }
-  function login(nextUser) { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setAuthMode(null); setView("dashboard"); }
-  function logout() { localStorage.removeItem("shibaai-user"); setUser(null); setView("home"); }
+  useEffect(() => { document.documentElement.dataset.theme = theme; localStorage.setItem("shibaai-theme",theme); },[theme]);
+  useEffect(() => { const syncRoute = () => { setView(viewFromPath(window.location.pathname)); setSelectedTool(new URLSearchParams(window.location.search).get("tool") || "quiz"); }; window.addEventListener("popstate",syncRoute); return () => window.removeEventListener("popstate",syncRoute); },[]);
+  useEffect(() => { const shortcut = (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setSearchOpen(true); } if (event.key === "Escape") setSearchOpen(false); }; window.addEventListener("keydown",shortcut); return () => window.removeEventListener("keydown",shortcut); },[]);
+  function openDashboard(tool = "quiz") { setSelectedTool(tool); if (user) { setView("dashboard"); window.history.pushState({},"",`/app?tool=${encodeURIComponent(tool)}`); window.scrollTo({top:0,behavior:"smooth"}); } else setAuthMode("signup"); }
+  function login(nextUser) { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setAuthMode(null); setView("dashboard"); window.history.pushState({},"",`/app?tool=${encodeURIComponent(selectedTool)}`); }
+  function logout() { localStorage.removeItem("shibaai-user"); setUser(null); setView("home"); window.history.pushState({},"",paths.home); }
   function saveProfile(nextUser) { try { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setProfileOpen(false); } catch { alert("That photo is too large for browser storage. Try a smaller image."); } }
-  const pages = { home: <Home onStart={openDashboard} />, dashboard: user ? <Dashboard initialTool={selectedTool} user={user} /> : <Home onStart={openDashboard} />, about: <AboutPage onStart={openDashboard} />, pricing: <PricingPage onStart={openDashboard} />, resources: <ResourcesPage onStart={openDashboard} />, faq: <FAQPage />, contact: <ContactPage /> };
-  function navigate(page) { setView(page); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  return <div className="app"><div className="announcement-bar"><span>🐾</span> ShibaAI is in early access — explore all 12 study tools free <button onClick={() => openDashboard()}>Start studying →</button></div><Header user={user} onHome={() => navigate("home")} onNavigate={navigate} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{pages[view] || pages.home}<Footer user={user} onHome={() => navigate("home")} onStart={openDashboard} onLegal={setLegalPage} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}{legalPage && <LegalModal type={legalPage} onClose={() => setLegalPage(null)} />}<CookieNotice onPrivacy={() => setLegalPage("privacy")} /></div>;
+  const pages = { home: <Home onStart={openDashboard} />, dashboard: user ? <Dashboard initialTool={selectedTool} user={user} /> : <Home onStart={openDashboard} />, about: <AboutPage onStart={openDashboard} />, pricing: <PricingPage onStart={openDashboard} />, resources: <ResourcesPage onStart={openDashboard} />, faq: <FAQPage />, contact: <ContactPage />, "not-found": <NotFoundPage onHome={() => navigate("home")} /> };
+  function navigate(page) { const path = paths[page] || paths.home; window.history.pushState({},"",path); setView(page); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  return <div className="app"><div className="announcement-bar"><span>🐾</span> ShibaAI is in early access — explore all 12 study tools free <button onClick={() => openDashboard()}>Start studying →</button></div><Header user={user} theme={theme} onToggleTheme={() => setTheme((value) => value === "dark" ? "light" : "dark")} onSearch={() => setSearchOpen(true)} onHome={() => navigate("home")} onNavigate={navigate} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{pages[view] || pages["not-found"]}<Footer user={user} onHome={() => navigate("home")} onStart={openDashboard} onLegal={setLegalPage} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}{legalPage && <LegalModal type={legalPage} onClose={() => setLegalPage(null)} />}{searchOpen && <SearchModal onClose={() => setSearchOpen(false)} onNavigate={navigate} onTool={openDashboard} />}<CookieNotice onPrivacy={() => setLegalPage("privacy")} /></div>;
 }
