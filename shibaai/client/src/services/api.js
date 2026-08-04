@@ -33,3 +33,20 @@ export async function generateQuiz(notes) {
 
   return data;
 }
+
+export async function generateStudyTool(tool, notes) {
+  const url = `${API_URL}/api/study/generate`;
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tool, notes })
+    });
+  } catch {
+    throw new Error("ShibaAI could not reach the study server. Check the connection and try again.");
+  }
+  const data = await response.json().catch(() => null);
+  if (!response.ok) throw new Error(data?.error || `The study server returned an error (${response.status}).`);
+  return data;
+}

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import quizRoutes from "./routes/quizRoutes.js";
+import studyRoutes from "./routes/studyRoutes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/quiz", quizRoutes);
+app.use("/api/study", studyRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error("Unhandled server error:", err);

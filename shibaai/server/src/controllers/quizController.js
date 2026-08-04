@@ -28,9 +28,11 @@ export async function generateQuiz(req, res) {
     return res.json({ questions });
   } catch (error) {
     console.error("Quiz controller error:", error);
-
-    return res.status(500).json({
-      error: "Failed to generate quiz."
+    const isQuotaError = error?.status === 429;
+    return res.status(isQuotaError ? 429 : 500).json({
+      error: isQuotaError
+        ? "The AI service is busy or its quota was reached. Please try again soon."
+        : "The AI service could not create a quiz. Check the server key and try again."
     });
   }
 }
