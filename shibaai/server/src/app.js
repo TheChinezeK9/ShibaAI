@@ -11,6 +11,13 @@ app.use(cors({
 }));
 app.use(express.json({ limit: "1mb" }));
 
+app.get("/", (_req, res) => {
+  res.json({
+    message: "ShibaAI API is running.",
+    health: "/api/health"
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   res.json({ message: "ShibaAI API is running." });
 });
