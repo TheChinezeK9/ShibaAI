@@ -15,7 +15,7 @@ const tools = [
   { id: "practice", icon: "?", name: "Practice Questions", description: "Generate short-answer prompts for active recall." }
 ];
 
-function Header({ user, onHome, onOpenAuth, onDashboard, onLogout }) {
+function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile }) {
   return (
     <header className="site-header">
       <button className="brand" onClick={onHome} aria-label="ShibaAI home">
@@ -24,14 +24,23 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout }) {
       </button>
       <nav>
         <button onClick={onHome}>Home</button>
-        <button onClick={onDashboard}>Study tools</button>
+        <div className="nav-dropdown">
+          <button className="dropdown-trigger" onClick={() => onDashboard()}>Study tools <span>⌄</span></button>
+          <div className="tools-dropdown">
+            <small>CHOOSE A STUDY TOOL</small>
+            <div>{tools.map((tool) => <button key={tool.id} onClick={() => onDashboard(tool.id)}><span>{tool.icon}</span><b>{tool.name}</b></button>)}</div>
+          </div>
+        </div>
       </nav>
       <div className="header-actions">
         {user ? (
-          <>
-            <span className="user-chip">{user.name.slice(0, 1).toUpperCase()}</span>
-            <button className="text-button" onClick={onLogout}>Log out</button>
-          </>
+          <div className="profile-menu">
+            <button className="profile-trigger" aria-label="Open profile menu">
+              <span className="user-chip">{user.avatar ? <img src={user.avatar} alt="Your profile" /> : user.name.slice(0, 1).toUpperCase()}</span>
+              <span className="profile-name">{user.name}</span><span>⌄</span>
+            </button>
+            <div className="profile-dropdown"><div className="profile-summary"><span className="user-chip">{user.avatar ? <img src={user.avatar} alt="" /> : user.name.slice(0, 1).toUpperCase()}</span><div><strong>{user.name}</strong><small>{user.email}</small></div></div><button onClick={onProfile}>◉ Edit profile</button><button onClick={() => onDashboard()}>✦ My study space</button><button className="logout-item" onClick={onLogout}>↗ Log out</button></div>
+          </div>
         ) : (
           <>
             <button className="text-button" onClick={() => onOpenAuth("login")}>Log in</button>
@@ -43,6 +52,22 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout }) {
   );
 }
 
+function ProfileModal({ user, onClose, onSave }) {
+  const [draft, setDraft] = useState(user);
+  const [error, setError] = useState("");
+  function upload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { setError("Choose an image file."); return; }
+    if (file.size > 2 * 1024 * 1024) { setError("Profile photos must be under 2 MB."); return; }
+    const reader = new FileReader();
+    reader.onload = () => { setDraft((current) => ({ ...current, avatar: reader.result })); setError(""); };
+    reader.readAsDataURL(file);
+  }
+  function submit(event) { event.preventDefault(); onSave({ ...draft, name: draft.name.trim() || "Student" }); }
+  return <div className="modal-backdrop" onMouseDown={onClose}><div className="auth-modal profile-modal" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={onClose}>×</button><h2>Your profile</h2><p>Make your study space feel like yours.</p><div className="avatar-editor"><span className="profile-avatar-large">{draft.avatar ? <img src={draft.avatar} alt="Profile preview" /> : draft.name.slice(0,1).toUpperCase()}</span><div><label className="upload-button">Upload photo<input type="file" accept="image/*" onChange={upload} /></label>{draft.avatar && <button onClick={() => setDraft({ ...draft, avatar: "" })}>Remove</button>}<small>JPG, PNG, or WEBP · max 2 MB</small></div></div>{error && <div className="profile-error">{error}</div>}<form onSubmit={submit}><label>Display name<input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required /></label><label>Email<input type="email" value={draft.email} disabled /></label><button className="button" type="submit">Save profile</button></form></div></div>;
+}
+
 function Home({ onStart }) {
   return (
     <main>
@@ -52,7 +77,7 @@ function Home({ onStart }) {
           <h1>Study less.<br /><em>Learn more.</em></h1>
           <p>Turn any set of notes into quizzes, flashcards, study guides, and clear explanations in seconds.</p>
           <div className="hero-actions">
-            <button className="button" onClick={onStart}>Start studying free <span>→</span></button>
+            <button className="button" onClick={() => onStart()}>Start studying free <span>→</span></button>
             <a href="#tools">Explore tools</a>
           </div>
           <div className="trust-row"><span>✓ No credit card</span><span>✓ Built for students</span><span>✓ Instant results</span></div>
@@ -77,7 +102,7 @@ function Home({ onStart }) {
         </div>
       </section>
 
-      <section className="cta-band"><div><span className="eyebrow">READY WHEN YOU ARE</span><h2>Your notes are about to get a lot more useful.</h2></div><button className="button light-button" onClick={onStart}>Start studying free →</button></section>
+      <section className="cta-band"><div><span className="eyebrow">READY WHEN YOU ARE</span><h2>Your notes are about to get a lot more useful.</h2></div><button className="button light-button" onClick={() => onStart()}>Start studying free →</button></section>
     </main>
   );
 }
@@ -103,6 +128,7 @@ function Dashboard({ initialTool, user }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState(() => { try { return JSON.parse(localStorage.getItem("shibaai-history")) || []; } catch { return []; } });
   const active = tools.find((tool) => tool.id === activeId);
 
   useEffect(() => { setActiveId(initialTool || "quiz"); }, [initialTool]);
@@ -113,20 +139,24 @@ function Dashboard({ initialTool, user }) {
     try {
       const data = activeId === "quiz" ? await generateQuiz(notes) : await generateStudyTool(activeId, notes);
       setResult(activeId === "quiz" ? { questions: data.questions } : data);
+      const nextHistory = [{ id: Date.now(), tool: active.name, icon: active.icon, title: activeId === "quiz" ? "Practice quiz" : data.title, date: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }) }, ...history].slice(0, 6);
+      setHistory(nextHistory); localStorage.setItem("shibaai-history", JSON.stringify(nextHistory));
     } catch (err) { setError(err.message || "ShibaAI couldn't generate this yet."); }
     finally { setLoading(false); }
   }
 
-  return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div className="sidebar-tip"><span>✦</span><strong>Study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><label htmlFor="study-notes">Paste your notes or topic</label><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "ShibaAI is thinking…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}</section></main>;
+  return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div className="sidebar-tip"><span>✦</span><strong>Study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><label htmlFor="study-notes">Paste your notes or topic</label><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "ShibaAI is thinking…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}{history.length > 0 && !result && <section className="recent-section"><div className="recent-heading"><div><span className="eyebrow">YOUR LIBRARY</span><h2>Recent study sessions</h2></div><button onClick={() => { setHistory([]); localStorage.removeItem("shibaai-history"); }}>Clear</button></div><div className="recent-grid">{history.map((item) => <button key={item.id} onClick={() => chooseTool(tools.find((tool) => tool.name === item.tool)?.id || "quiz")}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.tool} · {item.date}</small></div><b>→</b></button>)}</div></section>}</section></main>;
 }
 
 export default function App() {
   const [view, setView] = useState("home");
   const [selectedTool, setSelectedTool] = useState("quiz");
   const [authMode, setAuthMode] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [user, setUser] = useState(() => { try { return JSON.parse(localStorage.getItem("shibaai-user")); } catch { return null; } });
   function openDashboard(tool = "quiz") { setSelectedTool(tool); if (user) setView("dashboard"); else setAuthMode("signup"); }
   function login(nextUser) { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setAuthMode(null); setView("dashboard"); }
   function logout() { localStorage.removeItem("shibaai-user"); setUser(null); setView("home"); }
-  return <div className="app"><Header user={user} onHome={() => setView("home")} onDashboard={() => openDashboard(selectedTool)} onOpenAuth={setAuthMode} onLogout={logout} />{view === "home" ? <Home onStart={openDashboard} /> : <Dashboard initialTool={selectedTool} user={user} />}{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}</div>;
+  function saveProfile(nextUser) { try { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setProfileOpen(false); } catch { alert("That photo is too large for browser storage. Try a smaller image."); } }
+  return <div className="app"><Header user={user} onHome={() => setView("home")} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{view === "home" ? <Home onStart={openDashboard} /> : <Dashboard initialTool={selectedTool} user={user} />}{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}</div>;
 }
