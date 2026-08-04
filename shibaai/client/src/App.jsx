@@ -100,6 +100,13 @@ function LegalModal({ type, onClose }) {
   return <div className="modal-backdrop legal-backdrop" onMouseDown={onClose}><article className="legal-modal" onMouseDown={(e) => e.stopPropagation()}><header><div><span className="eyebrow">SHIBAAI LEGAL</span><h1>{page.title}</h1><p>Effective {page.updated}</p></div><button className="modal-close" onClick={onClose}>×</button></header><div className="legal-intro">🐕 Clear rules, plain language, and respect for student privacy.</div>{page.sections.map(([heading,body]) => <section key={heading}><h2>{heading}</h2><p>{body}</p></section>)}<div className="legal-note">This product is still in development. These documents are a practical starting point and should be reviewed by qualified counsel before a commercial launch.</div></article></div>;
 }
 
+function CookieNotice({ onPrivacy }) {
+  const [visible,setVisible] = useState(() => localStorage.getItem("shibaai-cookie-choice") !== "accepted");
+  if (!visible) return null;
+  function accept() { localStorage.setItem("shibaai-cookie-choice","accepted"); setVisible(false); }
+  return <aside className="cookie-notice"><span>🦴</span><div><strong>A small cookie note</strong><p>ShibaAI uses browser storage to remember your profile, preferences, and recent sessions. No advertising cookies.</p><button onClick={onPrivacy}>Read privacy policy</button></div><button className="cookie-accept" onClick={accept}>Got it</button></aside>;
+}
+
 function ProfileModal({ user, onClose, onSave }) {
   const [draft, setDraft] = useState(user);
   const [error, setError] = useState("");
@@ -143,6 +150,8 @@ function Home({ onStart }) {
         </div>
       </section>
 
+      <section className="proof-strip"><span>BUILT FOR EVERY SUBJECT</span><div><b>Biology</b><b>History</b><b>Mathematics</b><b>Literature</b><b>Chemistry</b><b>Psychology</b></div></section>
+
       <section className="tools-showcase" id="tools">
         <div className="center-heading"><span className="eyebrow">ONE PLACE. EVERY STUDY TOOL.</span><h2>Everything you need to feel ready.</h2><p>Choose a tool, paste your notes, and let ShibaAI do the busywork.</p></div>
         <div className="tool-grid">
@@ -151,6 +160,8 @@ function Home({ onStart }) {
       </section>
 
       <section className="how-it-works"><div className="shiba-callout"><img src={logo} alt="ShibaAI mascot" /><div><span className="eyebrow">YOUR STUDY COMPANION</span><h2>From messy notes to “I’ve got this.”</h2><p>ShibaAI handles the organizing so you can spend your energy learning.</p></div></div><div className="steps-grid"><article><span>01</span><b>🐾</b><h3>Bring your notes</h3><p>Paste a lecture, textbook section, rough outline, or any topic you want to master.</p></article><article><span>02</span><b>🦴</b><h3>Pick your tool</h3><p>Choose from twelve focused tools built for different kinds of studying.</p></article><article><span>03</span><b>🎓</b><h3>Learn actively</h3><p>Quiz yourself, review explanations, and return to your recent sessions anytime.</p></article></div></section>
+
+      <section className="testimonial-section"><div className="center-heading"><span className="eyebrow">STUDENT VOICES</span><h2>Studying feels lighter with a copilot.</h2></div><div className="testimonial-grid"><article><div>★★★★★</div><blockquote>“The quiz explanations help me understand why an answer is right instead of just showing a score.”</blockquote><footer><span>AM</span><div><strong>Early student tester</strong><small>Biology</small></div></footer></article><article className="featured-quote"><div>★★★★★</div><blockquote>“I pasted my rough lecture notes and finally had a study guide I could actually follow.”</blockquote><footer><span>JR</span><div><strong>Early student tester</strong><small>World History</small></div></footer></article><article><div>★★★★★</div><blockquote>“The focus timer makes it easier to start. Twenty-five minutes feels manageable.”</blockquote><footer><span>SK</span><div><strong>Early student tester</strong><small>Algebra</small></div></footer></article></div><p className="testimonial-disclosure">Illustrative feedback from early product testing.</p></section>
 
       <section className="cta-band"><div><span className="eyebrow">READY WHEN YOU ARE</span><h2>Your notes are about to get a lot more useful.</h2></div><button className="button light-button" onClick={() => onStart()}>Start studying free →</button></section>
     </main>
@@ -225,5 +236,5 @@ export default function App() {
   function saveProfile(nextUser) { try { localStorage.setItem("shibaai-user", JSON.stringify(nextUser)); setUser(nextUser); setProfileOpen(false); } catch { alert("That photo is too large for browser storage. Try a smaller image."); } }
   const pages = { home: <Home onStart={openDashboard} />, dashboard: user ? <Dashboard initialTool={selectedTool} user={user} /> : <Home onStart={openDashboard} />, about: <AboutPage onStart={openDashboard} />, pricing: <PricingPage onStart={openDashboard} />, resources: <ResourcesPage onStart={openDashboard} />, faq: <FAQPage />, contact: <ContactPage /> };
   function navigate(page) { setView(page); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  return <div className="app"><Header user={user} onHome={() => navigate("home")} onNavigate={navigate} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{pages[view] || pages.home}<Footer user={user} onHome={() => navigate("home")} onStart={openDashboard} onLegal={setLegalPage} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}{legalPage && <LegalModal type={legalPage} onClose={() => setLegalPage(null)} />}</div>;
+  return <div className="app"><div className="announcement-bar"><span>🐾</span> ShibaAI is in early access — explore all 12 study tools free <button onClick={() => openDashboard()}>Start studying →</button></div><Header user={user} onHome={() => navigate("home")} onNavigate={navigate} onDashboard={openDashboard} onOpenAuth={setAuthMode} onLogout={logout} onProfile={() => setProfileOpen(true)} />{pages[view] || pages.home}<Footer user={user} onHome={() => navigate("home")} onStart={openDashboard} onLegal={setLegalPage} />{authMode && <AuthModal mode={authMode} setMode={setAuthMode} onClose={() => setAuthMode(null)} onSuccess={login} />}{profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} onSave={saveProfile} />}{legalPage && <LegalModal type={legalPage} onClose={() => setLegalPage(null)} />}<CookieNotice onPrivacy={() => setLegalPage("privacy")} /></div>;
 }
