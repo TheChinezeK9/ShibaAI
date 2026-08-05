@@ -3,7 +3,7 @@ const API_URL = (
   (import.meta.env.DEV ? "http://localhost:5001" : "")
 ).replace(/\/$/, "");
 
-export async function generateQuiz(notes) {
+export async function generateQuiz(notes, options = {}) {
   const url = `${API_URL}/api/quiz/generate`;
   let response;
   try {
@@ -12,7 +12,7 @@ export async function generateQuiz(notes) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ notes })
+      body: JSON.stringify({ notes, ...options })
     });
   } catch {
     throw new Error("ShibaAI could not reach the quiz server. Please try again shortly.");
@@ -34,14 +34,14 @@ export async function generateQuiz(notes) {
   return data;
 }
 
-export async function generateStudyTool(tool, notes) {
+export async function generateStudyTool(tool, notes, options = {}) {
   const url = `${API_URL}/api/study/generate`;
   let response;
   try {
     response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tool, notes })
+      body: JSON.stringify({ tool, notes, ...options })
     });
   } catch {
     throw new Error("ShibaAI could not reach the study server. Check the connection and try again.");

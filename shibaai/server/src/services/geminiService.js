@@ -8,16 +8,18 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY
 });
 
-export async function generateQuizFromNotes(notes) {
+export async function generateQuizFromNotes(notes, { difficulty = "standard", questionCount = 5 } = {}) {
   const prompt = `
 You are an academic quiz generator for a high school student.
 
-Read the study notes below and generate exactly 5 multiple-choice quiz questions.
+Read the study notes below and generate exactly ${questionCount} multiple-choice quiz questions.
 
 Requirements:
 - Questions must be accurate and based only on the notes
-- Mix easy and medium difficulty
-- Make wording clear for a high school student
+- Target difficulty: ${difficulty}. Simple means direct recall, standard mixes recall and application, and advanced emphasizes reasoning.
+- Use short, direct sentences and plain language
+- Test important ideas, not trivia
+- Avoid trick questions and ambiguous choices
 - Include exactly 4 plausible answer choices per question
 - correctAnswer must exactly match one of the choices
 - Add a short explanation grounded in the notes
@@ -65,7 +67,7 @@ ${notes}
     throw new Error("Missing questions array.");
   }
 
-  const isValid = parsed.questions.length === 5 && parsed.questions.every(
+  const isValid = parsed.questions.length === questionCount && parsed.questions.every(
     (item) =>
       typeof item.question === "string" &&
       Array.isArray(item.choices) &&

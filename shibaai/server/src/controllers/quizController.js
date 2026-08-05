@@ -2,7 +2,7 @@ import { generateQuizFromNotes } from "../services/geminiService.js";
 
 export async function generateQuiz(req, res) {
   try {
-    const { notes } = req.body;
+    const { notes, difficulty = "standard", questionCount = 5 } = req.body;
 
     if (!notes || typeof notes !== "string" || !notes.trim()) {
       return res.status(400).json({
@@ -23,7 +23,9 @@ export async function generateQuiz(req, res) {
       });
     }
 
-    const questions = await generateQuizFromNotes(notes);
+    const safeDifficulty = ["simple", "standard", "advanced"].includes(difficulty) ? difficulty : "standard";
+    const safeCount = [5, 10, 15].includes(Number(questionCount)) ? Number(questionCount) : 5;
+    const questions = await generateQuizFromNotes(notes, { difficulty: safeDifficulty, questionCount: safeCount });
 
     return res.json({ questions });
   } catch (error) {

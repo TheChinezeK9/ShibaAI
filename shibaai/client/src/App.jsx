@@ -204,6 +204,8 @@ function ToolResult({ result }) {
 
 function FocusTimer() {
   const [seconds, setSeconds] = useState(25 * 60);
+  const [duration, setDuration] = useState(25);
+  const [customMinutes,setCustomMinutes] = useState("25");
   const [running, setRunning] = useState(false);
   useEffect(() => {
     if (!running) return undefined;
@@ -212,8 +214,10 @@ function FocusTimer() {
   }, [running]);
   const minutes = Math.floor(seconds / 60).toString().padStart(2,"0");
   const remainder = (seconds % 60).toString().padStart(2,"0");
-  function reset(value = 25) { setRunning(false); setSeconds(value * 60); }
-  return <div className="focus-timer"><div className="timer-mascot">🐕</div><div><small>SHIBA FOCUS</small><strong>{minutes}:{remainder}</strong></div><button onClick={() => setRunning(!running)}>{running ? "Pause" : seconds === 0 ? "Restart" : "Focus"}</button><button className="timer-reset" onClick={() => reset()}>↻</button><div className="timer-presets"><button onClick={() => reset(25)}>25m</button><button onClick={() => reset(45)}>45m</button><button onClick={() => reset(5)}>Break</button></div></div>;
+  function reset(value = duration) { setRunning(false); setDuration(value); setCustomMinutes(String(value)); setSeconds(value * 60); }
+  function applyCustom(event) { event.preventDefault(); const value = Math.min(120,Math.max(1,Number(customMinutes) || 25)); reset(value); }
+  const progress = Math.max(0,Math.min(100,(seconds / (duration * 60)) * 100));
+  return <div className="focus-timer" style={{"--timer-progress":`${progress * 3.6}deg`}}><div className="timer-mascot">🐕</div><div><small>{duration <= 10 ? "SHIBA BREAK" : "SHIBA FOCUS"}</small><strong>{minutes}:{remainder}</strong></div><button onClick={() => { if (seconds === 0) reset(duration); setRunning((value) => !value); }}>{running ? "Pause" : seconds === 0 ? "Restart" : "Focus"}</button><button className="timer-reset" onClick={() => reset()}>↻</button><div className="timer-presets"><button className={duration === 25 ? "active" : ""} onClick={() => reset(25)}>25m</button><button className={duration === 45 ? "active" : ""} onClick={() => reset(45)}>45m</button><button className={duration === 5 ? "active" : ""} onClick={() => reset(5)}>Break</button></div><form className="custom-timer" onSubmit={applyCustom}><label>Custom<input type="number" min="1" max="120" value={customMinutes} onChange={(event) => setCustomMinutes(event.target.value)} aria-label="Custom timer minutes"/></label><span>min</span><button type="submit">Set</button></form></div>;
 }
 
 function Dashboard({ initialTool, initialNotes = "", user }) {
@@ -222,6 +226,9 @@ function Dashboard({ initialTool, initialNotes = "", user }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [difficulty,setDifficulty] = useState("standard");
+  const [detail,setDetail] = useState("quick");
+  const [questionCount,setQuestionCount] = useState(5);
   const [history, setHistory] = useState(() => { try { return JSON.parse(localStorage.getItem("shibaai-history")) || []; } catch { return []; } });
   const active = tools.find((tool) => tool.id === activeId);
 
@@ -232,7 +239,9 @@ function Dashboard({ initialTool, initialNotes = "", user }) {
     if (notes.trim().length < 40) { setError("Add at least a few sentences so ShibaAI has enough material to work with."); return; }
     setLoading(true); setError(""); setResult(null);
     try {
-      const data = activeId === "quiz" ? await generateQuiz(notes) : await generateStudyTool(activeId, notes);
+      const data = activeId === "quiz"
+        ? await generateQuiz(notes,{ difficulty, questionCount })
+        : await generateStudyTool(activeId,notes,{ difficulty, detail });
       setResult(activeId === "quiz" ? { questions: data.questions } : data);
       const nextHistory = [{ id: Date.now(), tool: active.name, icon: active.icon, title: activeId === "quiz" ? "Practice quiz" : data.title, date: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }) }, ...history].slice(0, 6);
       setHistory(nextHistory); localStorage.setItem("shibaai-history", JSON.stringify(nextHistory));
@@ -240,7 +249,7 @@ function Dashboard({ initialTool, initialNotes = "", user }) {
     finally { setLoading(false); }
   }
 
-  return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div><FocusTimer /><div className="sidebar-tip"><span>🐾</span><strong>Shiba study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><div className="generator-title"><div><span className="paw-dot">🐾</span><label htmlFor="study-notes">Paste your notes or topic</label></div><span>Shiba is ready to help</span></div><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "ShibaAI is thinking…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}{history.length > 0 && !result && <section className="recent-section"><div className="recent-heading"><div><span className="eyebrow">YOUR LIBRARY</span><h2>Recent study sessions</h2></div><button onClick={() => { setHistory([]); localStorage.removeItem("shibaai-history"); }}>Clear</button></div><div className="recent-grid">{history.map((item) => <button key={item.id} onClick={() => chooseTool(tools.find((tool) => tool.name === item.tool)?.id || "quiz")}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.tool} · {item.date}</small></div><b>→</b></button>)}</div></section>}</section></main>;
+  return <main className="dashboard-shell"><aside className="sidebar"><div><small>STUDY TOOLS</small>{tools.map((tool) => <button key={tool.id} className={activeId === tool.id ? "active" : ""} onClick={() => chooseTool(tool.id)}><span>{tool.icon}</span>{tool.name}</button>)}</div><div><FocusTimer /><div className="sidebar-tip"><span>🐾</span><strong>Shiba study tip</strong><p>Active recall beats rereading. Test yourself before reviewing.</p></div></div></aside><section className="workspace"><div className="workspace-welcome"><div><span className="eyebrow">GOOD TO SEE YOU, {user.name.toUpperCase()}</span><h1>{active.name}</h1><p>{active.description}</p></div><div className="streak"><span>🔥</span><div><small>STUDY STREAK</small><strong>1 day</strong></div></div></div><div className="generator-card"><div className="generator-title"><div><span className="paw-dot">🐾</span><label htmlFor="study-notes">Paste your notes or topic</label></div><span>Choose your level, then generate</span></div><textarea id="study-notes" value={notes} maxLength={12000} disabled={loading} onChange={(e) => setNotes(e.target.value)} placeholder="Paste class notes, a textbook passage, or describe the topic you want to study…" /><div className="generation-options"><label>Level<select value={difficulty} onChange={(event) => setDifficulty(event.target.value)} disabled={loading}><option value="simple">Simple</option><option value="standard">Standard</option><option value="advanced">Advanced</option></select></label>{activeId === "quiz" ? <label>Questions<select value={questionCount} onChange={(event) => setQuestionCount(Number(event.target.value))} disabled={loading}><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></label> : <label>Detail<select value={detail} onChange={(event) => setDetail(event.target.value)} disabled={loading}><option value="quick">Quick</option><option value="detailed">Detailed</option></select></label>}</div><div className="generator-actions"><span>{notes.length.toLocaleString()} / 12,000</span><button className="button" disabled={loading} onClick={generate}>{loading ? "Creating…" : `Generate ${active.name}`} <b>✦</b></button></div></div><ErrorMessage message={error} />{activeId === "quiz" ? <QuizResults questions={result?.questions || []} /> : <ToolResult result={result} />}{history.length > 0 && !result && <section className="recent-section"><div className="recent-heading"><div><span className="eyebrow">YOUR LIBRARY</span><h2>Recent study sessions</h2></div><button onClick={() => { setHistory([]); localStorage.removeItem("shibaai-history"); }}>Clear</button></div><div className="recent-grid">{history.map((item) => <button key={item.id} onClick={() => chooseTool(tools.find((tool) => tool.name === item.tool)?.id || "quiz")}><span>{item.icon}</span><div><strong>{item.title}</strong><small>{item.tool} · {item.date}</small></div><b>→</b></button>)}</div></section>}</section></main>;
 }
 
 const paths = { home:"/", about:"/about", pricing:"/pricing", subjects:"/subjects", resources:"/resources", faq:"/faq", contact:"/contact", dashboard:"/app" };

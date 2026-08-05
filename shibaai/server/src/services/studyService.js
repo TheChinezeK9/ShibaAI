@@ -16,12 +16,30 @@ const toolInstructions = {
   "note-cleanup": "Rewrite and organize the material into 6 to 10 clean sections. Correct obvious grammar, preserve factual meaning, and highlight connections between ideas."
 };
 
-export async function generateStudyMaterial(tool, notes) {
+export async function generateStudyMaterial(tool, notes, { difficulty = "standard", detail = "quick" } = {}) {
   const instruction = toolInstructions[tool];
   if (!instruction) throw new Error("Unknown study tool.");
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: `You are ShibaAI, a precise and encouraging study copilot. Use only the supplied material. ${instruction}\n\nReturn JSON only in this exact shape:\n{"title":"A specific result title","items":[{"heading":"Short heading","content":"Useful explanation"}]}\n\nStudy material:\n${notes}`,
+    contents: `You are ShibaAI, a precise study copilot. Use only the supplied material.
+
+Task: ${instruction}
+Difficulty: ${difficulty}. Simple uses plain explanations, standard balances recall and application, and advanced emphasizes connections and reasoning.
+Detail: ${detail}. Quick means 1–3 concise sentences per item. Detailed means 3–5 useful sentences per item.
+
+Writing rules:
+- Lead with the answer or main idea
+- Use short, clear sentences
+- Remove filler, praise, repetition, and unnecessary introductions
+- Define unfamiliar terms the first time they appear
+- Be specific enough to study from
+- Never invent facts beyond the supplied material
+
+Return JSON only in this exact shape:
+{"title":"A specific result title","items":[{"heading":"Short heading","content":"Clear, useful explanation"}]}
+
+Study material:
+${notes}`,
     config: { responseMimeType: "application/json" }
   });
   const parsed = JSON.parse(response.text || "{}");
