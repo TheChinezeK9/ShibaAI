@@ -557,3 +557,36 @@ html { scroll-behavior:smooth; }.tools-showcase,.how-it-works,.testimonial-secti
 
 .generation-options { margin-top:12px; padding:12px; display:flex; gap:12px; border:1px solid #e2e9ee; border-radius:13px; background:#f8fbfd; }.generation-options label { min-width:135px; margin:0; color:#677581; font-size:.68rem; font-weight:900; text-transform:uppercase; letter-spacing:.05em; }.generation-options select { width:100%; min-height:38px; margin-top:5px; padding:7px 30px 7px 10px; border:1px solid #cfdae2; border-radius:9px; color:#293d4c; background:white; font-size:.83rem; font-weight:700; text-transform:none; outline:none; }.generation-options select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(63,136,197,.15); }[data-theme="dark"] .generation-options { border-color:#30485a; background:#10212f; }[data-theme="dark"] .generation-options label { color:#aebdca; }[data-theme="dark"] .generation-options select { color:#e5eef5; border-color:#3a5264; background:#172c3c; }
 @media (max-width:500px) { .generation-options { display:grid; grid-template-columns:1fr 1fr; }.generation-options label { min-width:0; } }
+
+/* Spacing rhythm audit */
+:root { --section-space:76px; --section-space-mobile:56px; }
+.landing-hero { min-height:620px; padding-top:84px; padding-bottom:72px; }
+.home-subjects { padding-top:var(--section-space); padding-bottom:var(--section-space); }
+.tools-showcase { padding-top:80px; padding-bottom:80px; }
+.how-it-works { margin-top:0; margin-bottom:0; padding-top:72px; padding-bottom:72px; }
+.testimonial-section { padding-top:80px; padding-bottom:80px; }
+.cta-band { margin-top:64px; margin-bottom:64px; }
+.center-heading { margin-bottom:42px; }
+.tool-grid { gap:18px; }.tool-card { min-height:220px; padding:23px; }
+.home-subjects > div:last-child { gap:18px; }.home-subjects > div:last-child > button { min-height:240px; }
+.site-footer { margin-top:0; }
+.page-hero { padding-top:82px; padding-bottom:68px; }
+.mission-block,.pricing-grid,.featured-resource,.contact-layout { margin-top:64px; }
+.values-section { padding-top:76px; padding-bottom:76px; }
+.subject-catalog,.topic-section { margin-top:64px; margin-bottom:80px; }
+.subject-hero { padding-top:82px; padding-bottom:72px; }
+.dashboard-shell { padding-top:30px; gap:32px; }
+.workspace-welcome { margin-bottom:22px; }
+.generator-card { padding:25px; }.generator-card textarea { min-height:195px; }
+.generation-options { margin-top:10px; }.generator-actions { margin-top:12px; }
+.workspace .results-section,.generated-result { margin-top:20px; }
+@media (max-width:700px) {
+  .landing-hero { min-height:auto; padding-top:var(--section-space-mobile); padding-bottom:var(--section-space-mobile); }
+  .home-subjects,.tools-showcase,.testimonial-section { padding-top:var(--section-space-mobile); padding-bottom:var(--section-space-mobile); }
+  .how-it-works { padding-top:var(--section-space-mobile); padding-bottom:var(--section-space-mobile); }
+  .cta-band { margin-top:48px; margin-bottom:48px; }
+  .center-heading { margin-bottom:32px; }
+  .page-hero { padding-top:58px; padding-bottom:50px; }
+  .dashboard-shell { padding-top:20px; }
+  .generator-card { padding:18px; }.generator-card textarea { min-height:180px; }
+}

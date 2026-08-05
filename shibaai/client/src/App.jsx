@@ -234,7 +234,19 @@ function Dashboard({ initialTool, initialNotes = "", user }) {
 
   useEffect(() => { setActiveId(initialTool || "quiz"); }, [initialTool]);
   useEffect(() => { if (initialNotes) setNotes(initialNotes); }, [initialNotes]);
-  function chooseTool(id) { setActiveId(id); setResult(null); setError(""); }
+  function chooseTool(id) {
+    const saved = history.find((item) => (item.toolId || tools.find((tool) => tool.name === item.tool)?.id) === id);
+    if (saved?.result) restoreSession(saved);
+    else { setActiveId(id); setResult(null); setError(""); }
+  }
+  function restoreSession(item) {
+    const toolId = item.toolId || tools.find((tool) => tool.name === item.tool)?.id || "quiz";
+    setActiveId(toolId); setNotes(item.notes || ""); setResult(item.result || null); setError("");
+    setDifficulty(item.settings?.difficulty || "standard");
+    setDetail(item.settings?.detail || "quick");
+    setQuestionCount(item.settings?.questionCount || 5);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
   async function generate() {
     if (notes.trim().length < 40) { setError("Add at least a few sentences so ShibaAI has enough material to work with."); return; }
     setLoading(true); setError(""); setResult(null);
@@ -242,9 +254,11 @@ function Dashboard({ initialTool, initialNotes = "", user }) {
       const data = activeId === "quiz"
         ? await generateQuiz(notes,{ difficulty, questionCount })
         : await generateStudyTool(activeId,notes,{ difficulty, detail });
-      setResult(activeId === "quiz" ? { questions: data.questions } : data);
-      const nextHistory = [{ id: Date.now(), tool: active.name, icon: active.icon, title: activeId === "quiz" ? "Practice quiz" : data.title, date: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }) }, ...history].slice(0, 6);
-      setHistory(nextHistory); localStorage.setItem("shibaai-history", JSON.stringify(nextHistory));
+      const generatedResult = activeId === "quiz" ? { questions: data.questions } : data;
+      setResult(generatedResult);
+      const nextHistory = [{ id: Date.now(), toolId: activeId, tool: active.name, icon: active.icon, title: activeId === "quiz" ? `${questionCount}-question quiz` : data.title, date: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }), notes, result: generatedResult, settings: { difficulty, detail, questionCount } }, ...history].slice(0, 6);
+      setHistory(nextHistory);
+      try { localStorage.setItem("shibaai-history", JSON.stringify(nextHistory)); } catch { setError("Your result was created, but browser storage is full. Download it to keep a copy."); }
     } catch (err) { setError(err.message || "ShibaAI couldn't generate this yet."); }
     finally { setLoading(false); }
   }
