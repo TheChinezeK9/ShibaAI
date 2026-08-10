@@ -796,3 +796,22 @@ p,li { text-wrap:pretty; }.eyebrow,.demo-label,.tool-card b,.home-subjects small
 [data-theme="dark"] .site-header { background:rgba(7,20,31,.94); }
 [data-theme="dark"] .sidebar button { color:#afc1cd; }[data-theme="dark"] .sidebar small { color:#86a0b2; }
 [data-theme="dark"] .generator-title>span { color:#91b4c9; }
+
+/* Background correction — calm ShibaAI canvas with restrained glass */
+body,.app { background:#fbfaf7; }
+.landing-hero { background:radial-gradient(circle at 82% 22%,rgba(95,174,223,.13),transparent 30%),radial-gradient(circle at 12% 82%,rgba(241,123,52,.09),transparent 28%),#fbfaf7; }
+.landing-hero::before { inset:20px; border:1px solid rgba(86,137,173,.12); background:rgba(255,255,255,.28); box-shadow:none; }
+.landing-hero::after { display:none; }
+.home-subjects { background:#f5f9fc; }
+.tools-showcase { background:#fbfaf7; }
+.testimonial-section { background:#f6f8fa; }
+.page-hero,.subject-hero { background:linear-gradient(180deg,#f3f8fc 0%,#fbfaf7 100%); }
+.proof-strip { background:#f5f8fa; }
+.demo-card,.tool-card,.home-subjects>div:last-child>button,.steps-grid article,.testimonial-grid article,.generator-card,.generated-result,.workspace .results-section,.pricing-grid article,.value-grid article,.resource-grid article,.contact-details article,.contact-form-card,.subject-card,.topic-grid>button,.guide-action-card { backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 14px 38px rgba(36,79,112,.08),inset 0 1px rgba(255,255,255,.8); }
+[data-theme="dark"] body,[data-theme="dark"] .app { background:#07131e; }
+[data-theme="dark"] .landing-hero { background:radial-gradient(circle at 82% 20%,rgba(40,119,166,.16),transparent 32%),#07131e; }
+[data-theme="dark"] .landing-hero::before { border-color:rgba(104,180,217,.12); background:rgba(14,37,52,.34); box-shadow:none; }
+[data-theme="dark"] .home-subjects,[data-theme="dark"] .tools-showcase,[data-theme="dark"] .testimonial-section { background:#091925; }
+[data-theme="dark"] .page-hero,[data-theme="dark"] .subject-hero { background:linear-gradient(180deg,#0b2231 0%,#07131e 100%); }
+[data-theme="dark"] .proof-strip { background:#0b1d2a; }
+body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { background:#07131e; }
