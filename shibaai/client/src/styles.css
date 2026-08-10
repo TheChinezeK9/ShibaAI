@@ -848,3 +848,37 @@ body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { backgroun
 /* Expanded subject navigator */
 .proof-subjects { grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:minmax(132px,1fr); overflow-x:auto; scrollbar-width:thin; scrollbar-color:rgba(65,132,177,.24) transparent; }
 .proof-subjects button { min-width:132px; }
+
+/* Site-wide spacing audit — consistent reading rhythm */
+.proof-strip { min-height:176px; padding-top:18px; padding-bottom:18px; grid-template-columns:190px 1fr; gap:30px; }
+.proof-heading { gap:6px!important; }.proof-heading>strong { font-size:1.02rem; line-height:1.4; }
+.proof-subjects { grid-template-columns:repeat(5,minmax(0,1fr)); grid-auto-flow:row; grid-auto-columns:auto; gap:7px 10px!important; overflow:visible; }
+.proof-subjects button { min-width:0; min-height:62px; padding:11px 12px; grid-template-columns:32px 1fr; column-gap:10px; border:0; border-radius:11px; }
+.proof-subjects button:hover { background:rgba(74,154,205,.09); }.proof-subjects button>span { font-size:1.45rem; }.proof-subjects button>b { font-size:.84rem; }.proof-subjects button>small { margin-top:2px; font-size:.67rem; }
+:where(.marketing-page,.subject-page,.guide-page,.dashboard-shell) h1,:where(.marketing-page,.subject-page,.guide-page,.dashboard-shell) h2,:where(.marketing-page,.subject-page,.guide-page,.dashboard-shell) h3 { text-wrap:balance; }
+:where(.marketing-page,.subject-page,.guide-page) p { line-height:1.7; }
+.page-hero>p,.subject-hero>p,.subject-detail-hero>p { margin-top:18px; }
+.catalog-heading { align-items:flex-end; gap:52px; }.catalog-heading>div { min-width:0; }.catalog-heading h2 { margin-top:10px; line-height:1.12; }.catalog-heading>p { line-height:1.7; }
+.home-subjects>div:last-child,.subject-grid,.topic-grid,.tool-grid,.testimonial-grid,.steps-grid { row-gap:20px; column-gap:18px; }
+.tool-card,.home-subjects>div:last-child>button,.subject-card,.topic-grid>button { padding:28px; }
+.tool-card h3,.home-subjects h3,.subject-card h2,.topic-grid h3 { margin-top:16px; margin-bottom:10px; line-height:1.25; }
+.tool-card p,.home-subjects p,.subject-card p,.topic-grid p { margin-top:0; margin-bottom:18px; line-height:1.65; }
+.pricing-grid,.value-grid,.resource-grid,.contact-layout { gap:22px; }
+.pricing-grid article,.value-grid article,.resource-grid article,.contact-details article,.contact-form-card { padding:32px; }
+.pricing-grid article h2,.value-grid article h2,.resource-grid article h2,.contact-details article h3 { margin-top:15px; margin-bottom:11px; line-height:1.25; }
+.pricing-grid article>p:not(.price),.value-grid article p,.resource-grid article p,.contact-details article p { margin-top:0; line-height:1.7; }
+.pricing-grid ul { margin-top:24px; margin-bottom:26px; display:grid; gap:11px; line-height:1.5; }
+.faq-list { display:grid; gap:12px; }.faq-list details { padding-inline:24px; }.faq-list summary { padding-block:19px; line-height:1.4; }.faq-list details p { padding-bottom:20px; line-height:1.75; }
+.guide-content>section { padding-top:42px; padding-bottom:42px; gap:22px; }.guide-content h2 { margin-bottom:22px; line-height:1.25; }.concept-list { gap:14px; }.concept-list li { line-height:1.65; }.vocab-list { gap:14px; }.vocab-list>div { padding:19px; }.vocab-list p { margin-top:8px; line-height:1.6; }.review-checks { gap:11px; }.review-checks label { padding:15px; line-height:1.5; }
+.generator-title { gap:20px; }.generator-title label { line-height:1.4; }.generation-options { margin-top:15px; }.generator-actions { margin-top:15px; }
+.site-footer p,.site-footer button,.site-footer a { line-height:1.55; }.footer-column { gap:10px; }
+@media (max-width:1000px) { .proof-strip { grid-template-columns:150px 1fr; }.proof-subjects { grid-template-columns:repeat(3,minmax(135px,1fr)); overflow-x:auto; }.catalog-heading { gap:30px; } }
+@media (max-width:760px) {
+  .proof-strip { min-height:0; padding:19px 18px 10px; display:block; }
+  .proof-heading { margin-bottom:14px; }
+  .proof-subjects { width:calc(100vw - 36px)!important; padding-bottom:10px!important; display:flex!important; gap:8px!important; overflow-x:auto!important; }
+  .proof-subjects button { min-width:146px; min-height:64px; padding:11px; }
+  .catalog-heading { align-items:flex-start; gap:18px; }
+  .tool-card,.home-subjects>div:last-child>button,.subject-card,.topic-grid>button,.pricing-grid article,.value-grid article,.resource-grid article,.contact-details article,.contact-form-card { padding:23px 20px; }
+  .guide-content>section { padding-top:34px; padding-bottom:34px; gap:14px; }
+}
