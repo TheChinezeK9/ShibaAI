@@ -744,6 +744,34 @@ p { text-wrap:pretty; }
   .proof-strip b { padding:8px 13px; }
 }
 
+/* Focus timer — compact, readable, and genuinely usable */
+.focus-timer { margin-bottom:14px; padding:17px; display:block; border:1px solid rgba(58,128,174,.18); border-radius:18px; color:#19384d; background:linear-gradient(145deg,rgba(246,251,254,.95),rgba(232,244,251,.88)); box-shadow:0 14px 32px rgba(29,79,112,.1); }
+.timer-display { display:flex; align-items:center; gap:13px; }
+.timer-ring { position:relative; width:58px; height:58px; flex:0 0 58px; display:grid; place-items:center; border-radius:50%; background:conic-gradient(#3f88c5 var(--timer-progress),rgba(63,136,197,.13) 0); }
+.timer-ring::before { position:absolute; inset:5px; border-radius:50%; content:""; background:#f2f9fd; box-shadow:inset 0 0 0 1px rgba(70,133,174,.1); }
+.timer-ring>span { position:relative; z-index:1; font-size:1.35rem; }
+.timer-copy { min-width:0; }.timer-copy small,.timer-copy strong,.timer-copy>span { display:block; }
+.timer-copy small { color:#3478a6; font-size:.62rem; font-weight:900; letter-spacing:.11em; }
+.timer-copy strong { margin:1px 0 0; color:#142e42; font-size:1.7rem; font-variant-numeric:tabular-nums; line-height:1.05; letter-spacing:-.045em; }
+.timer-copy>span { margin-top:3px; overflow:hidden; color:#708391; font-size:.68rem; white-space:nowrap; text-overflow:ellipsis; }
+.timer-actions { margin-top:14px; display:grid; grid-template-columns:1fr 38px; gap:7px; }
+.timer-actions button { min-height:38px; border:0; border-radius:10px; font-size:.75rem; font-weight:850; cursor:pointer; }
+.timer-start { color:white; background:linear-gradient(135deg,#347fb2,#24668f); box-shadow:0 8px 18px rgba(40,108,151,.2); }
+.focus-timer .timer-reset { padding:0; color:#39759c; border:1px solid rgba(60,126,169,.18); background:rgba(255,255,255,.68); font-size:1rem; }
+.timer-presets { margin-top:9px; display:grid; grid-template-columns:1fr 1fr 1.35fr; gap:5px; }
+.timer-presets button { min-height:31px; padding:5px 4px; border:1px solid transparent; border-radius:8px; color:#607889; background:rgba(255,255,255,.58); font-size:.65rem; font-weight:750; cursor:pointer; }
+.timer-presets button:hover { color:#245f86; background:white; }.timer-presets button.active { color:#1d648f; border-color:rgba(47,128,179,.25); background:#e1f2fb; box-shadow:inset 0 1px white; }
+.custom-timer { margin-top:10px; padding-top:10px; display:grid; grid-template-columns:1fr auto auto; align-items:end; gap:6px; border-top:1px solid rgba(55,120,162,.14); }
+.custom-timer label { min-width:0; color:#426b85; font-size:.6rem; font-weight:850; letter-spacing:.06em; text-transform:uppercase; }.custom-timer label>span { display:block; margin-bottom:4px; }
+.custom-timer input { width:100%; height:32px; margin:0; padding:5px 8px; border:1px solid rgba(55,120,162,.22); border-radius:8px; color:#213c4e; background:rgba(255,255,255,.72); font-size:.76rem; font-weight:750; outline:none; }
+.custom-timer>span { padding-bottom:8px; color:#708491; font-size:.58rem; }.custom-timer>button { min-height:32px; padding:5px 10px; border:0; border-radius:8px; color:white; background:#315f7e; font-size:.67rem; font-weight:850; cursor:pointer; }
+[data-theme="dark"] .focus-timer { color:#e5f0f6; border-color:rgba(89,168,208,.17); background:linear-gradient(145deg,rgba(19,48,67,.9),rgba(12,34,49,.9)); box-shadow:0 16px 36px rgba(0,5,12,.26); }
+[data-theme="dark"] .timer-ring { background:conic-gradient(#55addb var(--timer-progress),rgba(93,174,215,.15) 0); box-shadow:none; }[data-theme="dark"] .timer-ring::before { background:#102b3d; box-shadow:inset 0 0 0 1px rgba(111,190,228,.1); }
+[data-theme="dark"] .timer-copy small { color:#8bc9e8; }[data-theme="dark"] .timer-copy strong { color:#f0f7fb; }[data-theme="dark"] .timer-copy>span { color:#8fa5b3; }
+[data-theme="dark"] .focus-timer .timer-reset,[data-theme="dark"] .timer-presets button { color:#b6cfdb; border-color:rgba(95,173,211,.14); background:rgba(7,24,35,.5); }
+[data-theme="dark"] .timer-presets button:hover { color:#dff4fd; background:#15364b; }[data-theme="dark"] .timer-presets button.active { color:#d8f1fc; border-color:rgba(91,184,229,.3); background:#19415a; }
+[data-theme="dark"] .custom-timer { border-color:rgba(96,174,212,.14); }[data-theme="dark"] .custom-timer label { color:#91c4dd; }[data-theme="dark"] .custom-timer input { color:#e5f1f6; border-color:rgba(98,176,214,.2); background:rgba(5,20,30,.55); }[data-theme="dark"] .custom-timer>span { color:#809aa9; }
+
 /* Restrained tech glass — interactive surfaces only */
 :root { --glass-line:rgba(65,132,177,.16); --glass-fill:rgba(255,255,255,.64); --glass-shadow:0 18px 45px rgba(34,77,108,.1); }
 body,.app { background:#fafbfc; }
@@ -805,3 +833,14 @@ body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { backgroun
   .proof-subjects { width:calc(100vw - 36px)!important; padding-bottom:12px!important; display:flex!important; justify-content:flex-start!important; gap:0!important; overflow-x:auto!important; }
   .proof-subjects button { min-width:130px; padding:13px 11px; }
 }
+
+/* Readability pass — opaque menus and relaxed compact text */
+.tools-dropdown,.simple-dropdown,.profile-dropdown { background:#fdfefe; box-shadow:0 24px 64px rgba(21,50,72,.24); backdrop-filter:blur(28px) saturate(125%); -webkit-backdrop-filter:blur(28px) saturate(125%); }
+.tools-dropdown { padding:22px; }.tools-dropdown small { margin:1px 6px 15px; font-size:.68rem; line-height:1.4; }
+.tools-dropdown>div { gap:8px 10px; }.tools-dropdown>div button { min-height:52px; padding:9px 11px; gap:11px; font-size:.9rem; line-height:1.35; }
+.simple-dropdown>button { min-height:58px; padding:11px 12px; }.simple-dropdown b { font-size:.88rem; line-height:1.35; }.simple-dropdown small { margin-top:4px; font-size:.7rem; line-height:1.4; }
+.profile-summary { gap:12px; padding:10px 9px 16px; }.profile-summary strong { line-height:1.35; }.profile-summary small { margin-top:4px; line-height:1.45; }
+.profile-dropdown>button { min-height:43px; line-height:1.35; }
+.timer-copy small { line-height:1.35; }.timer-copy>span { line-height:1.35; }.custom-timer label { line-height:1.35; }
+.proof-heading>span,.proof-heading>strong,.proof-subjects button>b,.proof-subjects button>small { line-height:1.35; }
+[data-theme="dark"] .tools-dropdown,[data-theme="dark"] .simple-dropdown,[data-theme="dark"] .profile-dropdown { border-color:#29495d; background:#0e2332; box-shadow:0 26px 70px rgba(0,0,0,.48); }
