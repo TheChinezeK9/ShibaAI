@@ -773,3 +773,10 @@ body,.app { background:#fafbfc; }
 [data-theme="dark"] .proof-strip { background:#0a1d2a; }[data-theme="dark"] .proof-strip b { color:#c8dce7; border-color:rgba(93,170,208,.17); background:rgba(19,45,62,.62); }
 [data-theme="dark"] .page-hero,[data-theme="dark"] .subject-hero { background:radial-gradient(circle at 50% -15%,rgba(35,126,176,.2),transparent 49%),#07141f; }
 body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { background:#07141f; }
+
+/* Full-bleed hero canvas — content stays constrained, gradient does not */
+.landing-hero { position:relative; isolation:isolate; background:transparent; }
+.landing-hero::before { position:absolute; top:0; bottom:0; left:50%; z-index:-1; width:100vw; display:block; border:0; border-radius:0; content:""; transform:translateX(-50%); background:radial-gradient(circle at 72% 25%,rgba(77,166,218,.13),transparent 31%),radial-gradient(circle at 14% 78%,rgba(239,119,52,.08),transparent 28%),#fafbfc; box-shadow:none; }
+.landing-hero::after { display:none; }
+[data-theme="dark"] .landing-hero { background:transparent; }
+[data-theme="dark"] .landing-hero::before { border:0; background:radial-gradient(circle at 72% 23%,rgba(34,119,169,.16),transparent 32%),radial-gradient(circle at 14% 78%,rgba(218,94,39,.09),transparent 29%),#07141f; box-shadow:none; }
