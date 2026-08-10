@@ -780,6 +780,22 @@ p { text-wrap:pretty; }
 [data-theme="dark"] .profile-trigger .user-chip { box-shadow:0 0 0 3px #0a1c29,0 5px 16px rgba(0,0,0,.3); }
 [data-theme="dark"] .proof-strip { border-color:#294253; box-shadow:none; }[data-theme="dark"] .home-subjects,[data-theme="dark"] .tools-showcase,[data-theme="dark"] .testimonial-section { border-color:#1f3747; box-shadow:none; }
 
+/* Brand lockup and intentional color boundaries */
+.site-header>.brand { min-height:54px; padding:5px 13px 5px 6px; border:1px solid rgba(31,73,101,.11); border-radius:15px; color:#394753!important; background:#fff!important; box-shadow:0 7px 20px rgba(27,64,90,.1); }
+.site-header>.brand>span { color:#394753!important; }.site-header>.brand>span>span { color:#3f88c5!important; }
+.site-header>.brand img { border:0; box-shadow:none; }
+[data-theme="dark"] .site-header>.brand { color:#394753!important; border-color:rgba(255,255,255,.86); background:#fff!important; box-shadow:0 8px 24px rgba(0,0,0,.28); }
+[data-theme="dark"] .site-header>.brand>span { color:#394753!important; }[data-theme="dark"] .site-header>.brand>span>span { color:#327cb8!important; }
+.proof-strip,.home-subjects,.tools-showcase,.testimonial-section { position:relative; border-top:0; }
+.proof-strip { border-bottom:0; }
+.proof-strip::before,.proof-strip::after,.home-subjects::before,.tools-showcase::before,.testimonial-section::before { position:absolute; right:0; left:0; z-index:2; height:2px; content:""; pointer-events:none; }
+.proof-strip::before { top:0; background:linear-gradient(90deg,#397eb2,#6fc6e5 55%,#f29a4a); }
+.proof-strip::after { bottom:0; background:linear-gradient(90deg,#f29a4a,#efc36a 42%,#4fa8d4); }
+.home-subjects::before { top:0; background:linear-gradient(90deg,#327db3,#68c3e3 65%,#b8e1ee); }
+.tools-showcase::before { top:0; background:linear-gradient(90deg,#f18a3b,#f4bd62 55%,#69b9dd); }
+.testimonial-section::before { top:0; background:linear-gradient(90deg,#5bb6d9,#397fb5 52%,#7ac7df); }
+[data-theme="dark"] .proof-strip::before,[data-theme="dark"] .proof-strip::after,[data-theme="dark"] .home-subjects::before,[data-theme="dark"] .tools-showcase::before,[data-theme="dark"] .testimonial-section::before { opacity:.72; }
+
 /* Cohesive visual polish — calmer scale, clearer depth, stronger hierarchy */
 .cookie-notice { top:auto; right:20px; bottom:20px; width:min(350px,calc(100vw - 40px)); padding:14px; gap:11px; border-radius:16px; }
 .cookie-notice>span { width:34px; height:34px; flex-basis:34px; }.cookie-notice strong { font-size:.84rem; line-height:1.35; }.cookie-notice p { margin:4px 0 6px; font-size:.7rem; line-height:1.5; }.cookie-accept { padding:8px 11px; font-size:.74rem; }
