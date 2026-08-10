@@ -163,7 +163,7 @@ function Home({ onStart, onSubjects }) {
         </div>
       </section>
 
-      <section className="proof-strip"><span>BUILT FOR EVERY SUBJECT</span><div><b>Biology</b><b>History</b><b>Mathematics</b><b>Literature</b><b>Chemistry</b><b>Psychology</b></div></section>
+      <section className="proof-strip"><div className="proof-heading"><span>SUBJECT LIBRARY</span><strong>Choose where to begin</strong></div><div className="proof-subjects">{subjects.map((subject) => <button key={subject.id} onClick={() => onSubjects(`/subjects/${subject.id}`)}><span>{subject.icon}</span><b>{subject.name}</b><small>{subject.topics.length} guides</small></button>)}</div></section>
 
       <section className="home-subjects"><div className="catalog-heading"><div><span className="eyebrow">NEW · READY-MADE GUIDES</span><h2>Start with a subject.</h2></div><button onClick={() => onSubjects()}>Browse the full library →</button></div><div>{subjects.map((subject) => <button key={subject.id} className={subject.color} onClick={() => onSubjects(`/subjects/${subject.id}`)}><span>{subject.icon}</span><div><small>{subject.topics.length} COMPLETE GUIDES</small><h3>{subject.name}</h3><p>{subject.description}</p><b>Explore subject →</b></div></button>)}</div></section>
 
