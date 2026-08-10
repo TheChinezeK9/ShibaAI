@@ -844,3 +844,7 @@ body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { backgroun
 .timer-copy small { line-height:1.35; }.timer-copy>span { line-height:1.35; }.custom-timer label { line-height:1.35; }
 .proof-heading>span,.proof-heading>strong,.proof-subjects button>b,.proof-subjects button>small { line-height:1.35; }
 [data-theme="dark"] .tools-dropdown,[data-theme="dark"] .simple-dropdown,[data-theme="dark"] .profile-dropdown { border-color:#29495d; background:#0e2332; box-shadow:0 26px 70px rgba(0,0,0,.48); }
+
+/* Expanded subject navigator */
+.proof-subjects { grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:minmax(132px,1fr); overflow-x:auto; scrollbar-width:thin; scrollbar-color:rgba(65,132,177,.24) transparent; }
+.proof-subjects button { min-width:132px; }
