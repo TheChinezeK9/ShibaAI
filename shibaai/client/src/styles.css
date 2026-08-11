@@ -992,3 +992,22 @@ body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { backgroun
   .tool-card,.home-subjects>div:last-child>button,.subject-card,.topic-grid>button,.pricing-grid article,.value-grid article,.resource-grid article,.contact-details article,.contact-form-card { padding:23px 20px; }
   .guide-content>section { padding-top:34px; padding-bottom:34px; gap:14px; }
 }
+
+/* Site-wide color threads — the Values-page line language across every page */
+:is(.mission-block,.values-section,.founder-note,.pricing-grid,.pricing-comparison,.pricing-note,.featured-resource,.resource-grid,.faq-section,.support-card,.newsletter,.contact-layout,.subject-catalog,.topic-section,.guide-content>section,.recent-section) { position:relative; }
+:is(.mission-block,.values-section,.pricing-grid,.pricing-comparison,.featured-resource,.resource-grid,.faq-section,.newsletter,.contact-layout,.subject-catalog,.topic-section,.recent-section)::before,
+.guide-content>section::before { position:absolute; top:0; right:0; left:0; height:2px; border-radius:999px; content:""; pointer-events:none; background:linear-gradient(90deg,#397fb5 0%,#69c2e2 48%,#f09a4c 100%); }
+.values-section::before,.resource-grid::before,.topic-section::before { background:linear-gradient(90deg,#ed8038,#f1bc5b 48%,#55afd5); }
+.pricing-grid::before,.contact-layout::before,.recent-section::before { background:linear-gradient(90deg,#5a9fd0,#736fca 52%,#cb687d); }
+.pricing-comparison::before,.faq-section::before,.subject-catalog::before { background:linear-gradient(90deg,#35a07e,#64bdd2 52%,#397fb5); }
+.guide-content>section:nth-child(3n+2)::before { background:linear-gradient(90deg,#ed8038,#efbd62 55%,#65b8d8); }
+.guide-content>section:nth-child(3n)::before { background:linear-gradient(90deg,#38a17f,#5dbbd7 52%,#6d72ca); }
+
+/* A short color rule gives repeated cards hierarchy without enclosing them again */
+:is(.value-grid,.pricing-grid,.resource-grid,.testimonial-grid,.subject-grid,.topic-grid,.contact-details)>:is(article,button) { position:relative; overflow:hidden; }
+:is(.value-grid,.pricing-grid,.resource-grid,.testimonial-grid,.subject-grid,.topic-grid,.contact-details)>:is(article,button)::before { position:absolute; top:0; right:0; left:0; height:3px; content:""; background:#4d9dca; opacity:.82; }
+:is(.value-grid,.pricing-grid,.resource-grid,.testimonial-grid,.subject-grid,.topic-grid,.contact-details)>:is(article,button):nth-child(3n+2)::before { background:#e98b43; }
+:is(.value-grid,.pricing-grid,.resource-grid,.testimonial-grid,.subject-grid,.topic-grid,.contact-details)>:is(article,button):nth-child(3n)::before { background:#3ea07e; }
+[data-theme="dark"] :is(.mission-block,.values-section,.pricing-grid,.pricing-comparison,.featured-resource,.resource-grid,.faq-section,.newsletter,.contact-layout,.subject-catalog,.topic-section,.recent-section)::before,
+[data-theme="dark"] .guide-content>section::before { opacity:.78; box-shadow:0 0 14px rgba(78,168,211,.13); }
+[data-theme="dark"] :is(.value-grid,.pricing-grid,.resource-grid,.testimonial-grid,.subject-grid,.topic-grid,.contact-details)>:is(article,button)::before { opacity:.72; }
