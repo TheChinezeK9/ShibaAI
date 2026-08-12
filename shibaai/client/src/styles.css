@@ -1013,3 +1013,24 @@ body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { backgroun
 @media (max-width:900px) and (min-width:701px) { .shiba-callout { gap:26px; padding:30px; }.shiba-callout img { width:126px; height:126px; flex-basis:126px; }.shiba-callout h2 { font-size:2rem; } }
 [data-theme="dark"] :is(.page-hero,.subject-hero,.subject-detail-hero)::after,[data-theme="dark"] .values-section::before { opacity:.78; box-shadow:0 0 14px rgba(78,168,211,.13); }
 @media (max-width:700px) { .founder-note img { width:180px; height:122px; flex-basis:180px; }.shiba-callout img { width:112px; height:112px; flex-basis:112px; } }
+
+/* One structural rule: divide direct page sections, never nested cards */
+main>section { position:relative; }
+main>section+section::before { position:absolute; top:0; right:auto; bottom:auto; left:50%; z-index:3; width:100vw; height:2px; border:0; border-radius:0; content:""; pointer-events:none; transform:translateX(-50%); background:linear-gradient(90deg,#397fb5 0%,#69c2e2 48%,#f09a4c 100%); opacity:1; box-shadow:none; }
+[data-theme="dark"] main>section+section::before { opacity:.78; box-shadow:0 0 14px rgba(78,168,211,.13); }
+
+/* Tighter section rhythm so dividers sit between content, not inside dead space */
+.principles-section { padding-top:72px; padding-bottom:72px; }
+.principles-section .section-title { margin-bottom:34px; }
+.principle-card { min-height:150px; padding:23px 0; }
+.values-in-practice { padding-top:72px; padding-bottom:72px; }
+.values-closing { padding-top:64px; padding-bottom:64px; }
+.values-page>.values-closing { margin-bottom:0!important; }
+.tools-showcase,.how-it-works,.testimonial-section { padding-top:60px; padding-bottom:60px; }
+.cta-band { margin-top:48px; margin-bottom:48px; }
+@media (max-width:760px) {
+  .principles-section,.values-in-practice { padding-top:58px; padding-bottom:58px; }
+  .principle-card { min-height:0; padding:20px 0; }
+  .values-closing { padding-top:52px; padding-bottom:52px; }
+  .tools-showcase,.how-it-works,.testimonial-section { padding-top:52px; padding-bottom:52px; }
+}
