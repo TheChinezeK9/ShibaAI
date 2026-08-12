@@ -1003,5 +1003,16 @@ body:has(.app[data-theme="dark"]),#root:has(.app[data-theme="dark"]) { backgroun
 :is(.pricing-comparison,.faq-section,.subject-catalog)::before { background:linear-gradient(90deg,#35a07e,#64bdd2 52%,#397fb5); }
 .values-section::before { top:0; }
 .shiba-callout img { width:154px; height:154px; flex-basis:154px; }
+[data-theme="dark"] :is(.mission-block,.how-it-works) { background:transparent; }
+[data-theme="dark"] :is(.values-section,.testimonial-section) { background:#0b2232; }
+.values-in-practice,.values-closing { position:relative; }
+.values-in-practice::before,.values-closing::before { position:absolute; top:0; left:50%; width:100vw; height:2px; content:""; pointer-events:none; transform:translateX(-50%); background:linear-gradient(90deg,#397fb5,#69c2e2 50%,#f09a4a); }
+[data-theme="dark"] .values-in-practice::before,[data-theme="dark"] .values-closing::before { opacity:.78; box-shadow:0 0 14px rgba(78,168,211,.13); }
+.site-header nav>button,.dropdown-trigger { border-radius:9px; transition:color .18s ease,background .18s ease,transform .18s ease; }
+.site-header nav>button:hover,.dropdown-trigger:hover,.nav-dropdown.open>.dropdown-trigger { color:#236f9e; background:rgba(63,136,197,.1); }
+.tools-dropdown>div button,.simple-dropdown>button,.profile-dropdown>button { transition:color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease; }
+.tools-dropdown>div button:hover,.simple-dropdown>button:hover,.profile-dropdown>button:hover { transform:translateX(3px); box-shadow:inset 3px 0 #4b9dca; }
+[data-theme="dark"] .site-header nav>button:hover,[data-theme="dark"] .dropdown-trigger:hover,[data-theme="dark"] .nav-dropdown.open>.dropdown-trigger { color:#b8e4f7; background:rgba(75,157,202,.13); }
+@media (max-width:900px) and (min-width:701px) { .shiba-callout { gap:26px; padding:30px; }.shiba-callout img { width:126px; height:126px; flex-basis:126px; }.shiba-callout h2 { font-size:2rem; } }
 [data-theme="dark"] :is(.how-it-works,.cta-band,.mission-block,.values-section,.pricing-grid,.pricing-comparison,.featured-resource,.resource-grid,.faq-section,.newsletter,.contact-layout,.subject-catalog,.topic-section)::before { opacity:.78; box-shadow:0 0 14px rgba(78,168,211,.13); }
 @media (max-width:700px) { .founder-note img { width:180px; height:122px; flex-basis:180px; }.shiba-callout img { width:112px; height:112px; flex-basis:112px; } }

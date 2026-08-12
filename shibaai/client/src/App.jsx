@@ -28,7 +28,14 @@ function Chevron() {
 function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, onNavigate, onSearch, theme, onToggleTheme }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu,setOpenMenu] = useState(null);
-  useEffect(() => { setOpenMenu(null); },[onDashboard,onNavigate,user]);
+  useEffect(() => { setOpenMenu(null); },[user]);
+  useEffect(() => {
+    const closeOutside = (event) => {
+      if (!event.target.closest(".nav-dropdown,.profile-menu")) setOpenMenu(null);
+    };
+    document.addEventListener("pointerdown",closeOutside);
+    return () => document.removeEventListener("pointerdown",closeOutside);
+  },[]);
   function mobileNavigate(page) { setMobileOpen(false); onNavigate(page); }
   function closeThen(action) { action(); window.setTimeout(() => setOpenMenu(null),0); }
   return (
@@ -39,7 +46,7 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, on
       </button>
       <nav>
         <button onClick={onHome}>Home</button>
-        <div className={`nav-dropdown ${openMenu === "tools" ? "open" : ""}`} onMouseLeave={() => setOpenMenu(null)}>
+        <div className={`nav-dropdown ${openMenu === "tools" ? "open" : ""}`}>
           <button className="dropdown-trigger" aria-expanded={openMenu === "tools"} onClick={() => setOpenMenu((value) => value === "tools" ? null : "tools")}>Study tools <Chevron /></button>
           <div className="tools-dropdown">
             <small>CHOOSE A STUDY TOOL</small>
@@ -49,14 +56,14 @@ function Header({ user, onHome, onOpenAuth, onDashboard, onLogout, onProfile, on
         <button onClick={() => onNavigate("about")}>About</button>
         <button onClick={() => onNavigate("pricing")}>Pricing</button>
         <button onClick={() => onNavigate("subjects")}>Subjects</button>
-        <div className={`nav-dropdown more-dropdown ${openMenu === "more" ? "open" : ""}`} onMouseLeave={() => setOpenMenu(null)}><button className="dropdown-trigger" aria-expanded={openMenu === "more"} onClick={() => setOpenMenu((value) => value === "more" ? null : "more")}>More <Chevron /></button><div className="simple-dropdown"><button onClick={() => closeThen(() => onNavigate("values"))}><span>✦</span><div><b>Our values</b><small>What guides ShibaAI</small></div></button><button onClick={() => closeThen(() => onNavigate("resources"))}><span>▤</span><div><b>Resources</b><small>Study guides and ideas</small></div></button><button onClick={() => closeThen(() => onNavigate("faq"))}><span>?</span><div><b>FAQ</b><small>Common questions answered</small></div></button><button onClick={() => closeThen(() => onNavigate("contact"))}><span>✉</span><div><b>Contact</b><small>Talk with our team</small></div></button></div></div>
+        <div className={`nav-dropdown more-dropdown ${openMenu === "more" ? "open" : ""}`}><button className="dropdown-trigger" aria-expanded={openMenu === "more"} onClick={() => setOpenMenu((value) => value === "more" ? null : "more")}>More <Chevron /></button><div className="simple-dropdown"><button onClick={() => closeThen(() => onNavigate("values"))}><span>✦</span><div><b>Our values</b><small>What guides ShibaAI</small></div></button><button onClick={() => closeThen(() => onNavigate("resources"))}><span>▤</span><div><b>Resources</b><small>Study guides and ideas</small></div></button><button onClick={() => closeThen(() => onNavigate("faq"))}><span>?</span><div><b>FAQ</b><small>Common questions answered</small></div></button><button onClick={() => closeThen(() => onNavigate("contact"))}><span>✉</span><div><b>Contact</b><small>Talk with our team</small></div></button></div></div>
       </nav>
       <button className={`mobile-menu-button ${mobileOpen ? "open" : ""}`} onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu"><span /><span /><span /></button>
       <div className="header-actions">
         <button className="icon-header-button" onClick={onSearch} aria-label="Search ShibaAI">⌕</button>
         <button className="icon-header-button" onClick={onToggleTheme} aria-label={`Use ${theme === "dark" ? "light" : "dark"} mode`}>{theme === "dark" ? "☀" : "☾"}</button>
         {user ? (
-          <div className={`profile-menu ${openMenu === "profile" ? "open" : ""}`} onMouseLeave={() => setOpenMenu(null)}>
+          <div className={`profile-menu ${openMenu === "profile" ? "open" : ""}`}>
             <button className="profile-trigger" aria-label="Open profile menu" aria-expanded={openMenu === "profile"} onClick={() => setOpenMenu((value) => value === "profile" ? null : "profile")}>
               <span className="user-chip">{user.avatar ? <img src={user.avatar} alt="Your profile" /> : user.name.slice(0, 1).toUpperCase()}</span>
               <span className="profile-name">{user.name}</span><Chevron />
